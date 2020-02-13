@@ -37,8 +37,7 @@ const sprite = [
 		xv: 0,
 		yv: 0,
 		code: (thisSprite, spriteNum) => {
-			console.log(Math.max(-150 - thisSprite.yv, 0) / 20)
-			thisSprite.yv += 0.07 - (keyInput.up * Math.max(-150 - thisSprite.yv, 0) / 20)
+			thisSprite.yv += 0.1 - (keyInput.up * Math.max(-1 - thisSprite.yv, 0) / 30)
 
 			if (keyInput.left) //walk
 				thisSprite.xv -= keyInput.sprint * 0.05 + 0.1
@@ -49,8 +48,8 @@ const sprite = [
 			thisSprite.x += thisSprite.xv
 			thisSprite.xv /= 1.1
 
-			if (thisSprite.y >= 200) {
-				thisSprite.y = 200
+			if (thisSprite.y >= 176) {
+				thisSprite.y = 176
 				if (keyInput.up)
 					thisSprite.yv = -3 //jump
 				else
