@@ -39,23 +39,23 @@ var sprites = [
 		y: 0,
 		xv: 0,
 		yv: 0,
-		code: (ms, delta, thisSprite, spriteNum) => {
+		code: (thisSprite, spriteNum) => {
 
-			thisSprite.yv += 20 - (keyInput.up * Math.max(-150 - thisSprite.yv, 0) / 15)
+			thisSprite.yv += 0.4 - (keyInput.up * Math.max(-150 - thisSprite.yv, 0) / 200)
 
 			if (keyInput.left) //walk
-				thisSprite.xv -= 5 / delta
+				thisSprite.xv -= 2
 			if (keyInput.right)
-				thisSprite.xv += 5 / delta
+				thisSprite.xv += 200
 
-			thisSprite.y += thisSprite.yv / delta
-			thisSprite.x += thisSprite.xv / delta
-			thisSprite.xv /= 1.2 ** delta //this needs to be fixed, delta isn't used properly
+			thisSprite.y += thisSprite.yv
+			thisSprite.x += thisSprite.xv
+			thisSprite.xv /= 1.1
 
 			if (thisSprite.y >= 200) {
 				thisSprite.y = 200
 				if (keyInput.up)
-					thisSprite.yv = -350 //jump
+					thisSprite.yv = -3 //jump
 				else
 					thisSprite.yv = 0
 			}
@@ -75,26 +75,27 @@ var sprites = [
 	sourceImgs('tiles')
 	sourceImgs('sprites')
 }
-var lastMs = 0
+
 function step(ms) {
-	ctx.fillStyle = "magenta"
-	ctx.fillRect(0, 0, 640, 480)//temporary sky
 
+	runSprites()
 
-	runSprites(ms, ms - lastMs)
-	lastMs = ms
-
-	drawTiles(0, 0)
-	drawSprites(0, 0)
-
-	window.setTimeout(()=>{requestAnimationFrame(step)},70); //lag
-	//requestAnimationFrame(step)
+	window.setTimeout(step, 8.333333333333334) //120 tps
 }
 
-function runSprites(ms, delta) {
+
+function runSprites() {
 	for (let spriteNum in sprites) {
-		sprites[spriteNum] = sprites[spriteNum].code(ms, delta, sprites[spriteNum], spriteNum)
+		sprites[spriteNum] = sprites[spriteNum].code(sprites[spriteNum], spriteNum)
 	}
+}
+
+function draw() {
+	ctx.fillStyle = "magenta"
+	ctx.fillRect(0, 0, 640, 480)//temporary sky
+	drawTiles(0, 0)
+	drawSprites(0, 0)
+	requestAnimationFrame(draw)
 }
 
 function drawSprites(ox, oy) {
@@ -110,7 +111,7 @@ function drawTiles(ox, oy) {
 		}
 	}
 }
-requestAnimationFrame(step)
+requestAnimationFrame(draw)
 
 addEventListener("keydown", press(true))
 addEventListener("keyup", press(false))
@@ -136,3 +137,5 @@ function press(v) {
 		}
 	}
 }
+
+step()
