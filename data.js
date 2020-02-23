@@ -32,82 +32,81 @@ const tile = [
 	{ name: 'LDcorner' }
 ]
 
-const sprite = [
-	{
-		name: 'player',
-		x: 0,
-		y: 0,
-		xv: 0,
-		yv: 0,
-		scrollState: 0, //1 is right
-		code: {
-			init: (tS, spriteNum) => { //tS means thisSprite
-				return tS
-			},
-			update: (tS, spriteNum) => {
-				tS.yv += 0.1 - (keyInput.up * Math.max(-1 - tS.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
+const sprite = {
+	player: class {
+		constructor(x, y) {
+			this.x = x
+			this.y = y
+			this.xv = 0
+			this.yv = 0
+			this.scrollState = 0 //1 is right
+			this.img = getImg('sprite', 'player')
+		}
 
-				if (keyInput.left) // walk/run
-					tS.xv -= 0.1 + keyInput.sprint * 0.05
-				if (keyInput.right)
-					tS.xv += 0.1 + keyInput.sprint * 0.05
+		update() {
+			this.yv += 0.1 - (keyInput.up * Math.max(-1 - this.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
 
-				tS.y += tS.yv
-				tS.x += tS.xv
-				tS.xv /= 1.1
+			if (keyInput.left) // walk/run
+				this.xv -= 0.1 + keyInput.sprint * 0.05
+			if (keyInput.right)
+				this.xv += 0.1 + keyInput.sprint * 0.05
 
-				if (tS.y >= 176) { //fake collision
-					tS.y = 176
-					if (keyInput.up)
-						tS.yv = -3 //jump
-					else
-						tS.yv = 0
-				}
+			this.y += this.yv
+			this.x += this.xv
+			this.xv /= 1.1
 
-				{
-					if ((() => {
-						switch (tS.scrollState) { //reset scrolling when changing direction partly
-							case 1:
-								return tS.xv < 0
-							case -1:
-								return tS.xv > 0
-							default:
-								return false
-						}
-					})()) tS.scrollState = 0
+			if (this.y >= 176) { //fake collision
+				this.y = 176
+				if (keyInput.up)
+					this.yv = -3 //jump
+				else
+					this.yv = 0
+			}
 
-					var i = tS.x + scrollX //player relative to camera
-
-					if (i > ((tS.scrollState == 1) ? 120 : 232)) //past scroll border
-						scroll(1, 120)
-					else if (i < ((tS.scrollState == -1) ? 184 : 72))
-						scroll(-1, 184)
-
-					function scroll(state, a) {
-						tS.scrollState = state
-
-						scrollX += (//scroll camera to final position based on movement
-							(a - tS.x - scrollX) //final camera position
-								> 0 ? Math.max : Math.min)(tS.xv * -2.5, 0)
-						var i = tS.x + scrollX //player relative to camera
-						if (state == 1 ? i < a : i > a)//jitter fix
-							scrollX = a - tS.x
+			{
+				if ((() => {
+					switch (this.scrollState) { //reset scrolling when changing direction partly
+						case 1:
+							return this.xv < 0
+						case -1:
+							return this.xv > 0
+						default:
+							return false
 					}
-				}
-				return tS
+				})()) this.scrollState = 0
+
+				let i = this.x + scrollX //player relative to camera
+
+				if (i > ((this.scrollState == 1) ? 120 : 232)) //past scroll border
+					this.scroll(1, 120)
+				else if (i < ((this.scrollState == -1) ? 184 : 72))
+					this.scroll(-1, 184)
 			}
 		}
-	}
-]
 
-{
-	function sourceImgs(list) {
-		for (let x in eval(list)) {
-			let i = document.createElement('img')
-			i.setAttribute("src", "assets/" + list + "/" + eval(list)[x].name + '.png')
-			eval(list)[x].img = i
+		scroll(state, a) {
+			this.scrollState = state
+
+			scrollX += (//scroll camera to final position based on movement
+				(a - this.x - scrollX) //final camera position
+					> 0 ? Math.max : Math.min)(this.xv * -2.5, 0)
+
+			if (//jitter fix
+				state == 1 ?
+					this.x + scrollX < a :
+					this.x + scrollX > a
+			)
+				scrollX = a - this.x
 		}
 	}
-	sourceImgs('tile')
-	sourceImgs('sprite')
+}
+
+function getImg(type, img) {
+	let i = document.createElement('img')
+	i.src = "assets/" + type + "/" + img + '.png'
+	return i
+}
+
+for (let x in tile) {
+	tile[x].img = getImg('tile', tile[x].name)
 }

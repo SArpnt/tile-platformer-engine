@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
 var cSprites = [
-	sprite[0]
+	new sprite.player(0,0)
 ]
 
 function step() {
@@ -16,10 +16,11 @@ function step() {
 }
 
 function runSprites() {
-	for (let spriteNum in cSprites) {
-		cSprites[spriteNum] = cSprites[spriteNum].code.update(cSprites[spriteNum], spriteNum)
+	for (let sN in cSprites) { //sN is spriteNumber
+		cSprites[sN].update()
 	}
 }
+
 var lastMs = 0
 function draw(ms) {
 	ctx.fillStyle = "magenta"
