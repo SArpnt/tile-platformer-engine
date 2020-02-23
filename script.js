@@ -8,9 +8,9 @@ var cSprites = [
 function step(ms) {
 	runSprites()
 
-	scrollX=Math.round(scrollX)//Math.max(Math.min(scrollX, 0), (level[0].length * -16) + 320)) //keep scrolling in boundaries and round
-	scrollY = Math.max(Math.min(scrollY, 0), (level.length * -16) + 240)
-	
+	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level[0].length * -16) + 320)) //keep scrolling in boundaries and round
+	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.length * -16) + 240))
+
 	window.setTimeout(step, 8.333333333333334) //120 tps
 }
 
