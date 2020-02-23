@@ -5,13 +5,14 @@ var cSprites = [
 	sprite[0]
 ]
 
-function step(ms) {
+function step() {
 	runSprites()
 
 	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level[0].length * -16) + 320)) //keep scrolling in boundaries and round
 	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.length * -16) + 240))
 
 	window.setTimeout(step, 8.333333333333334) //120 tps
+	document.getElementById("tps").innerHTML = Math.round(1000/8.333333333333334)
 }
 
 function runSprites() {
@@ -19,12 +20,17 @@ function runSprites() {
 		cSprites[spriteNum] = cSprites[spriteNum].code.update(cSprites[spriteNum], spriteNum)
 	}
 }
-
-function draw() {
+var lastMs = 0
+function draw(ms) {
 	ctx.fillStyle = "magenta"
 	ctx.fillRect(0, 0, 640, 480)//temporary sky
+
 	drawTiles(scrollX, scrollY)
 	drawSprites(scrollX, scrollY)
+
+	document.getElementById("fps").innerHTML = Math.round(1000/(ms - lastMs))//fps counter
+	lastMs = ms
+
 	requestAnimationFrame(draw)
 }
 
