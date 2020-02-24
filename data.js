@@ -210,6 +210,11 @@ const sprite = {
 				push.up(pos)
 			pos.x += 16
 
+			/*cTile = getTile(pos.x, pos.y).collide
+			for (let side in cTile)
+			if (cTile[side])
+				push[side](pos)*/
+
 			function getTile(x, y) {
 				try {
 					if (x <= -16 || y <= -16) throw TypeError
