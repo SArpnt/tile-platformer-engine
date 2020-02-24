@@ -50,8 +50,8 @@ function drawSprites(ox, oy) {
 	for (let i in cSprites) {
 		ctx.drawImage(
 			cSprites[i].img,
-			(Math.round(cSprites[i].x) + ox) * 2,
-			(Math.round(cSprites[i].y) + oy) * 2
+			(Math.round(cSprites[i].pos.x) + ox) * 2,
+			(Math.round(cSprites[i].pos.y) + oy) * 2
 		)
 	}
 }

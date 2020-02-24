@@ -13,111 +13,211 @@ const level = [
 	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-	[1, 1, 1, 1, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+	[2, 1, 1, 1, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0]
 ]
 
 const tile = [
-	{ name: 'empty' },
-	{ name: 'dirt' },
-	{ name: 'floor' },
-	{ name: 'ceiling' },
-	{ name: 'Rwall' },
-	{ name: 'Lwall' },
-	{ name: 'RUcorner' },
-	{ name: 'LUcorner' },
-	{ name: 'RDcorner' },
-	{ name: 'LDcorner' }
+	{
+		name: 'empty',
+		collide: {
+			up: false,
+			down: false,
+			left: false,
+			right: false
+		}
+	},
+	{
+		name: 'dirt',
+		collide: {
+			up: false,
+			down: false,
+			left: false,
+			right: false
+		}
+	},
+	{
+		name: 'floor',
+		collide: {
+			up: true,
+			down: false,
+			left: false,
+			right: false
+		}
+	},
+	{
+		name: 'ceiling',
+		collide: {
+			up: false,
+			down: true,
+			left: false,
+			right: false
+		}
+	},
+	{
+		name: 'Rwall',
+		collide: {
+			up: false,
+			down: false,
+			left: false,
+			right: true
+		}
+	},
+	{
+		name: 'Lwall',
+		collide: {
+			up: false,
+			down: false,
+			left: true,
+			right: false
+		}
+	},
+	{
+		name: 'RUcorner',
+		collide: {
+			up: true,
+			down: false,
+			left: false,
+			right: true
+		}
+	},
+	{
+		name: 'LUcorner',
+		collide: {
+			up: true,
+			down: false,
+			left: true,
+			right: false
+		}
+	},
+	{
+		name: 'RDcorner',
+		collide: {
+			up: false,
+			down: true,
+			left: false,
+			right: true
+		}
+	},
+	{
+		name: 'LDcorner',
+		collide: {
+			up: false,
+			down: true,
+			left: true,
+			right: false
+		}
+	}
 ]
 
 const sprite = {
 	player: class {
 		constructor(x, y) {
-			this.x = x
-			this.y = y
-			this.xv = 0
-			this.yv = 0
+			this.pos = {
+				x: x,
+				y: y,
+				xv: 0,
+				yv: 0
+			}
 			this.scrollState = 0 //1 is right
 			this.img = getImg('sprite', 'player')
 		}
 
 		update() {
-			this.yv += 0.1 - (keyInput.up * Math.max(-1 - this.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
-
-			if (keyInput.left) // walk/run
-				this.xv -= 0.1 + keyInput.sprint * 0.05
-			if (keyInput.right)
-				this.xv += 0.1 + keyInput.sprint * 0.05
-
-			this.y += this.yv
-			this.x += this.xv
-			this.xv /= 1.1
-
-			this.collide()
+			this.pos = this.move(this.pos)
+			this.pos = this.collide(this.pos)
 
 			{
 				if ((() => {
 					switch (this.scrollState) { //reset scrolling when changing direction partly
 						case 1:
-							return this.xv < 0
+							return this.pos.xv < 0
 						case -1:
-							return this.xv > 0
+							return this.pos.xv > 0
 						default:
 							return false
 					}
 				})()) this.scrollState = 0
 
-				let i = this.x + scrollX //player relative to camera
+				let i = this.pos.x + scrollX //player relative to camera
 
 				if (i > ((this.scrollState == 1) ? 120 : 232)) //past scroll border
 					this.scroll(1, 120)
 				else if (i < ((this.scrollState == -1) ? 184 : 72))
 					this.scroll(-1, 184)
 			}
-			return [['spawn', sprite.test, this.x, this.y + 8]]
+			return [['spawn', sprite.test, this.pos.x, this.pos.y + 8]]
+		}
+
+		move(pos) {
+			pos.yv += 0.1 - (keyInput.up * Math.max(-1 - pos.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
+
+			if (keyInput.left) // walk/run
+				pos.xv -= 0.1 + keyInput.sprint * 0.05
+			if (keyInput.right)
+				pos.xv += 0.1 + keyInput.sprint * 0.05
+
+			pos.y += pos.yv
+			pos.x += pos.xv
+			pos.xv /= 1.1
+
+			return pos
 		}
 
 		scroll(state, a) {
 			this.scrollState = state
 
 			scrollX += (//scroll camera to final position based on movement
-				(a - this.x - scrollX) //final camera position
-					> 0 ? Math.max : Math.min)(this.xv * -2.5, 0)
+				(a - this.pos.x - scrollX) //final camera position
+					> 0 ? Math.max : Math.min)(this.pos.xv * -2.5, 0)
 
 			if (//jitter fix
 				state == 1 ?
-					this.x + scrollX < a :
-					this.x + scrollX > a
+					this.pos.x + scrollX < a :
+					this.pos.x + scrollX > a
 			)
-				scrollX = a - this.x
+				scrollX = a - this.pos.x
 		}
 
-		collide() {
-			console.log(
-				tile[
-					level
-					[Math.trunc(this.y / 16)]
-					[Math.trunc(this.x / 16)]
-				]
-					.name //change this
-			)
+		collide(pos) {
+			var cTile = getTile(pos.x, pos.y)
 
-			if (this.y >= 176) { //fake collision
-				this.y = 176
-				if (keyInput.up)
-					this.yv = -3 //jump
-				else
-					this.yv = 0
+			if (cTile.collide.up) {
+				let i = (Math.floor(pos.y / 16)) * 16
+				if (pos.y >= i) { //fake collision
+					pos.y = i
+					if (keyInput.up)
+						pos.yv = -3 //jump
+					else
+						pos.yv = 0
+				}
 			}
+			function getTile(x, y, d) {
+				try {
+					var i = tile[level
+					[Math.ceil(y / 16)]
+					[Math.ceil(x / 16)]]
+				}
+				catch (TypeError) {
+					var i = tile[0]
+				}
+				if (d)
+					return i[d]
+				else
+					return i
+			}
+			return pos
 		}
 
 	},
 	test: class {
 		constructor(x, y) {
-			this.x = x
-			this.y = y
+			this.pos = {
+				x: x,
+				y: y
+			}
 			this.timer = 0
 			this.img = getImg('sprite', 'test')
 		}
