@@ -191,7 +191,7 @@ const sprite = {
 			pos.x += 16
 
 			function collideUp(pos) {
-				let i = (Math.floor(pos.y / 16)) * 16
+				let i = Math.floor(pos.y / 16) * 16
 				if (pos.y >= i) { //fake collision
 					pos.y = i
 					if (keyInput.up)
@@ -203,6 +203,7 @@ const sprite = {
 			}
 			function getTile(x, y) {
 				try {
+					if (x<0||y<0) throw TypeError
 					return tile[level
 					[Math.ceil(y / 16)]
 					[Math.ceil(x / 16)]]
