@@ -126,6 +126,8 @@ const sprite = {
 		}
 
 		update() {
+			this.pos.last = Object.assign({}, this.pos)
+			delete this.pos.last.last
 			this.pos = this.move(this.pos)
 			this.pos = this.collide(this.pos)
 
@@ -182,28 +184,35 @@ const sprite = {
 		}
 
 		collide(pos) {
+			var push = {
+				up: function (pos) {
+					let i = Math.floor(pos.y / 16) * 16
+					if (pos.last.y <= i) {
+						if (pos.y >= i) { //fake collision
+							pos.y = i
+							if (keyInput.up)
+								pos.yv = -3 //jump
+							else
+								pos.yv = 0
+						}
+					}
+					return pos
+				}
+			}
+
 			var cTile
 			cTile = getTile(pos.x, pos.y).collide
-			if (cTile.up) collideUp(pos)
+			if (cTile.up)
+				pos = push.up(pos)
 			pos.x -= 16
 			cTile = getTile(pos.x, pos.y).collide
-			if (cTile.up) collideUp(pos)
+			if (cTile.up)
+				push.up(pos)
 			pos.x += 16
 
-			function collideUp(pos) {
-				let i = Math.floor(pos.y / 16) * 16
-				if (pos.y >= i) { //fake collision
-					pos.y = i
-					if (keyInput.up)
-						pos.yv = -3 //jump
-					else
-						pos.yv = 0
-				}
-				return pos
-			}
 			function getTile(x, y) {
 				try {
-					if (x<0||y<0) throw TypeError
+					if (x <= -16 || y <= -16) throw TypeError
 					return tile[level
 					[Math.ceil(y / 16)]
 					[Math.ceil(x / 16)]]
