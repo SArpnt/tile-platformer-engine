@@ -55,13 +55,7 @@ const sprite = {
 			this.x += this.xv
 			this.xv /= 1.1
 
-			if (this.y >= 176) { //fake collision
-				this.y = 176
-				if (keyInput.up)
-					this.yv = -3 //jump
-				else
-					this.yv = 0
-			}
+			this.collide()
 
 			{
 				if ((() => {
@@ -82,6 +76,7 @@ const sprite = {
 				else if (i < ((this.scrollState == -1) ? 184 : 72))
 					this.scroll(-1, 184)
 			}
+			return [['spawn', sprite.test, this.x, this.y + 8]]
 		}
 
 		scroll(state, a) {
@@ -97,6 +92,40 @@ const sprite = {
 					this.x + scrollX > a
 			)
 				scrollX = a - this.x
+		}
+
+		collide() {
+			console.log(
+				tile[
+					level
+					[Math.trunc(this.y / 16)]
+					[Math.trunc(this.x / 16)]
+				]
+					.name //change this
+			)
+
+			if (this.y >= 176) { //fake collision
+				this.y = 176
+				if (keyInput.up)
+					this.yv = -3 //jump
+				else
+					this.yv = 0
+			}
+		}
+
+	},
+	test: class {
+		constructor(x, y) {
+			this.x = x
+			this.y = y
+			this.timer = 0
+			this.img = getImg('sprite', 'test')
+		}
+		update() {
+			if (this.timer >= 5)
+				return [['kill']]
+			//this.img.style = "opacity:" + (1 - (this.timer / 10))
+			this.timer++
 		}
 	}
 }

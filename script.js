@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
 var cSprites = [
-	new sprite.player(0,0)
+	new sprite.player(0, 0)
 ]
 
 function step() {
@@ -12,12 +12,23 @@ function step() {
 	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.length * -16) + 240))
 
 	window.setTimeout(step, 8.333333333333334) //120 tps
-	document.getElementById("tps").innerHTML = Math.round(1000/8.333333333333334)
+	document.getElementById("tps").innerHTML = Math.round(1000 / 8.333333333333334)
 }
 
 function runSprites() {
 	for (let sN in cSprites) { //sN is spriteNumber
-		cSprites[sN].update()
+		let i = cSprites[sN].update()
+		if (i)
+			for (x in i) {
+				switch (i[x][0]) {
+					case 'kill':
+					case 'unload':
+						cSprites.splice(sN, 1)
+						break
+					case 'spawn':
+						cSprites.push(new i[x][1](...i[x].slice(2)))
+				}
+			}
 	}
 }
 
@@ -29,7 +40,7 @@ function draw(ms) {
 	drawTiles(scrollX, scrollY)
 	drawSprites(scrollX, scrollY)
 
-	document.getElementById("fps").innerHTML = Math.round(1000/(ms - lastMs))//fps counter
+	document.getElementById("fps").innerHTML = Math.round(1000 / (ms - lastMs))//fps counter
 	lastMs = ms
 
 	requestAnimationFrame(draw)
@@ -37,14 +48,22 @@ function draw(ms) {
 
 function drawSprites(ox, oy) {
 	for (let i in cSprites) {
-		ctx.drawImage(cSprites[i].img, (Math.round(cSprites[i].x) + ox) * 2, (Math.round(cSprites[i].y) + oy) * 2)
+		ctx.drawImage(
+			cSprites[i].img,
+			(Math.round(cSprites[i].x) + ox) * 2,
+			(Math.round(cSprites[i].y) + oy) * 2
+		)
 	}
 }
 
 function drawTiles(ox, oy) {
 	for (let y in level) {
 		for (let x in level[y]) {
-			ctx.drawImage(tile[level[y][x]].img, (x * 16 + ox) * 2, (y * 16 + oy) * 2)
+			ctx.drawImage(
+				tile[level[y][x]].img,
+				(x * 16 + ox) * 2,
+				(y * 16 + oy) * 2
+			)
 		}
 	}
 }
