@@ -206,37 +206,31 @@ const sprite = {
 
 			var cTile
 
-			cTile = getTile(pos.x, pos.y).collide
+			cTile = getTile(pos.x, pos.y).collide//floor
 			if (cTile.up)
 				pos = push.up(pos)
-			cTile = getTile(pos.x, pos.y - 16).collide
-			if (cTile.down)
-				pos = push.down(pos)
-
-			pos.x -= 16
-
-			cTile = getTile(pos.x, pos.y).collide
-			if (cTile.up)
-				pos = push.up(pos)
-			cTile = getTile(pos.x, pos.y - 16).collide
-			if (cTile.down)
-				pos = push.down(pos)
-
-			pos.x += 16
-
 			cTile = getTile(pos.x - 16, pos.y).collide
+			if (cTile.up)
+				pos = push.up(pos)
+
+			cTile = getTile(pos.x, pos.y - 16).collide//ceiling
+			if (cTile.down)
+				pos = push.down(pos)
+			cTile = getTile(pos.x - 16, pos.y - 16).collide
+			if (cTile.down)
+				pos = push.down(pos)
+
+			cTile = getTile(pos.x - 16, pos.y).collide //right
 			if (cTile.right)
 				pos = push.right(pos)
-			cTile = getTile(pos.x, pos.yv).collide
+			cTile = getTile(pos.x - 16, pos.y - 16).collide
+			if (cTile.right)
+				pos = push.right(pos)
+
+			cTile = getTile(pos.x, pos.y).collide //left
 			if (cTile.left)
 				pos = push.left(pos)
-
-			pos.y -= 16
-
-			cTile = getTile(pos.x - 16, pos.y).collide
-			if (cTile.right)
-				pos = push.right(pos)
-			cTile = getTile(pos.x, pos.y).collide
+			cTile = getTile(pos.x, pos.y - 16).collide
 			if (cTile.left)
 				pos = push.left(pos)
 
