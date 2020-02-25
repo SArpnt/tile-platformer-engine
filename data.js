@@ -185,50 +185,24 @@ const sprite = {
 
 		collide(pos) {
 			var push = {
-				up: function (pos) {
-					let i = Math.floor(pos.y / 16) * 16
-					if (pos.last.y <= i) {
-						if (pos.y >= i) {
-							pos.y = i
-							if (keyInput.up)
-								pos.yv = -3 //jump
-							else
-								pos.yv = 0
+				gen: function (xy, rev, jump = false) { //rev stands for reverse
+					return function (pos) {
+						let i = Math[rev ? 'ceil' : 'floor'](pos[xy] / 16) * 16
+						if (
+							(rev ? pos : pos.last)[xy] <= i &&
+							(rev ? pos.last : pos)[xy] >= i
+						) {
+							pos[xy] = i
+							pos[xy + 'v'] = (jump ? (keyInput.up ? -3 : 0) : 0) //jump
 						}
+						return pos
 					}
-					return pos
-				},
-				down: function (pos) {
-					let i = Math.ceil(pos.y / 16) * 16
-					if (pos.last.y >= i) {
-						if (pos.y <= i) {
-							pos.y = i
-							pos.yv = 0
-						}
-					}
-					return pos
-				},
-				left: function (pos) {
-					let i = Math.floor(pos.x / 16) * 16
-					if (pos.last.x <= i) {
-						if (pos.x >= i) {
-							pos.x = i
-							pos.xv = 0
-						}
-					}
-					return pos
-				},
-				right: function (pos) {
-					let i = Math.ceil(pos.x / 16) * 16
-					if (pos.last.x >= i) {
-						if (pos.x <= i) {
-							pos.x = i
-							pos.xv = 0
-						}
-					}
-					return pos
 				}
 			}
+			push.up = push.gen('y', false, true)
+			push.down = push.gen('y', true)
+			push.left = push.gen('x', false)
+			push.right = push.gen('x', true)
 
 			var cTile
 
@@ -267,7 +241,7 @@ const sprite = {
 				pos = push.left(pos)
 
 			pos.y += 16
-			
+
 			function getTile(x, y) {
 				try {
 					if (x <= -16 || y <= -16) throw TypeError
