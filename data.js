@@ -204,35 +204,24 @@ const sprite = {
 			push.left = push.gen('x', false)
 			push.right = push.gen('x', true)
 
-			var cTile
+			function pushif(dir, xo, yo) {
+				if (getTile(pos.x + xo, pos.y + yo).collide[dir])
+					pos = push[dir](pos)
+			}
 
-			cTile = getTile(pos.x, pos.y).collide//floor
-			if (cTile.up)
-				pos = push.up(pos)
-			cTile = getTile(pos.x - 16, pos.y).collide
-			if (cTile.up)
-				pos = push.up(pos)
-
-			cTile = getTile(pos.x, pos.y - 16).collide//ceiling
-			if (cTile.down)
-				pos = push.down(pos)
-			cTile = getTile(pos.x - 16, pos.y - 16).collide
-			if (cTile.down)
-				pos = push.down(pos)
-
-			cTile = getTile(pos.x - 16, pos.y).collide //right
-			if (cTile.right)
-				pos = push.right(pos)
-			cTile = getTile(pos.x - 16, pos.y - 16).collide
-			if (cTile.right)
-				pos = push.right(pos)
-
-			cTile = getTile(pos.x, pos.y).collide //left
-			if (cTile.left)
-				pos = push.left(pos)
-			cTile = getTile(pos.x, pos.y - 16).collide
-			if (cTile.left)
-				pos = push.left(pos)
+			var pushlist = [
+				['up', 0, 0],
+				['up', -16, 0],
+				['down', 0, -16],
+				['down', -16, -16],
+				['left', 0, 0],
+				['left', 0, -16],
+				['right', -16, 0],
+				['right', -16, -16]
+			]
+			
+			for (let i in pushlist)
+				pushif(...pushlist[i])
 
 			function getTile(x, y) {
 				try {
