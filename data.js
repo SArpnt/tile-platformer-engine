@@ -188,7 +188,7 @@ const sprite = {
 				up: function (pos) {
 					let i = Math.floor(pos.y / 16) * 16
 					if (pos.last.y <= i) {
-						if (pos.y >= i) { //fake collision
+						if (pos.y >= i) {
 							pos.y = i
 							if (keyInput.up)
 								pos.yv = -3 //jump
@@ -197,24 +197,77 @@ const sprite = {
 						}
 					}
 					return pos
+				},
+				down: function (pos) {
+					let i = Math.ceil(pos.y / 16) * 16
+					if (pos.last.y >= i) {
+						if (pos.y <= i) {
+							pos.y = i
+							pos.yv = 0
+						}
+					}
+					return pos
+				},
+				left: function (pos) {
+					let i = Math.floor(pos.x / 16) * 16
+					if (pos.last.x <= i) {
+						if (pos.x >= i) {
+							pos.x = i
+							pos.xv = 0
+						}
+					}
+					return pos
+				},
+				right: function (pos) {
+					let i = Math.ceil(pos.x / 16) * 16
+					if (pos.last.x >= i) {
+						if (pos.x <= i) {
+							pos.x = i
+							pos.xv = 0
+						}
+					}
+					return pos
 				}
 			}
 
 			var cTile
+
 			cTile = getTile(pos.x, pos.y).collide
 			if (cTile.up)
 				pos = push.up(pos)
+			cTile = getTile(pos.x, pos.y - 16).collide
+			if (cTile.down)
+				pos = push.down(pos)
+
 			pos.x -= 16
+
 			cTile = getTile(pos.x, pos.y).collide
 			if (cTile.up)
-				push.up(pos)
+				pos = push.up(pos)
+			cTile = getTile(pos.x, pos.y - 16).collide
+			if (cTile.down)
+				pos = push.down(pos)
+
 			pos.x += 16
 
-			/*cTile = getTile(pos.x, pos.y).collide
-			for (let side in cTile)
-			if (cTile[side])
-				push[side](pos)*/
+			cTile = getTile(pos.x - 16, pos.y).collide
+			if (cTile.right)
+				pos = push.right(pos)
+			cTile = getTile(pos.x, pos.yv).collide
+			if (cTile.left)
+				pos = push.left(pos)
 
+			pos.y -= 16
+
+			cTile = getTile(pos.x - 16, pos.y).collide
+			if (cTile.right)
+				pos = push.right(pos)
+			cTile = getTile(pos.x, pos.y).collide
+			if (cTile.left)
+				pos = push.left(pos)
+
+			pos.y += 16
+			
 			function getTile(x, y) {
 				try {
 					if (x <= -16 || y <= -16) throw TypeError
