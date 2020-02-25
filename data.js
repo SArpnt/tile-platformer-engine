@@ -234,8 +234,6 @@ const sprite = {
 			if (cTile.left)
 				pos = push.left(pos)
 
-			pos.y += 16
-
 			function getTile(x, y) {
 				try {
 					if (x <= -16 || y <= -16) throw TypeError
