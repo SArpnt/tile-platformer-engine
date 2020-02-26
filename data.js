@@ -129,7 +129,7 @@ const sprite = {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
 			this.pos = this.move(this.pos)
-			this.pos = this.collide(this.pos)
+			this.pos = this.collide(this.pos,keyInput.up)
 
 			{
 				if ((() => {
@@ -183,17 +183,17 @@ const sprite = {
 				scrollX = a - this.pos.x
 		}
 
-		collide(pos) {
+		collide(pos,jump) {
 			var push = {
-				gen: function (xy, rev, jump = false) { //rev stands for reverse
-					return function (pos) {
+				gen: function (xy, rev, canJump = false) { //rev stands for reverse
+					return function (pos){
 						let i = Math[rev ? 'ceil' : 'floor'](pos[xy] / 16) * 16
 						if (
 							(rev ? pos : pos.last)[xy] <= i &&
 							(rev ? pos.last : pos)[xy] >= i
 						) {
 							pos[xy] = i
-							pos[xy + 'v'] = (jump ? (keyInput.up ? -3 : 0) : 0) //jump
+							pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
 						}
 						return pos
 					}
@@ -219,7 +219,7 @@ const sprite = {
 				['right', -16, 0],
 				['right', -16, -16]
 			]
-			
+
 			for (let i in pushlist)
 				pushif(...pushlist[i])
 
