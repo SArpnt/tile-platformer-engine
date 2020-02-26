@@ -2,7 +2,8 @@ const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
 var cSprites = [
-	new sprite.player(0, 0)
+	new sprite.player(64, 160),
+	new sprite.enemy(96, 160)
 ]
 
 function step() {

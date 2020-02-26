@@ -2,18 +2,18 @@ var scrollX = 0
 var scrollY = 0
 
 const level = [
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-	[2, 1, 1, 1, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 2, 2, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0]
@@ -128,8 +128,8 @@ const sprite = {
 		update() {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
-			this.pos = this.move(this.pos)
-			this.pos = this.collide(this.pos,keyInput.up)
+			this.pos = sScript.move(this.pos, keyInput)
+			this.pos = sScript.collide(this.pos, keyInput.up)[0]
 
 			{
 				if ((() => {
@@ -153,21 +153,6 @@ const sprite = {
 			return [['spawn', sprite.test, this.pos.x, this.pos.y + 8]]
 		}
 
-		move(pos) {
-			pos.yv += 0.1 - (keyInput.up * Math.max(-1 - pos.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
-
-			if (keyInput.left) // walk/run
-				pos.xv -= 0.1 + keyInput.sprint * 0.05
-			if (keyInput.right)
-				pos.xv += 0.1 + keyInput.sprint * 0.05
-
-			pos.y += pos.yv
-			pos.x += pos.xv
-			pos.xv /= 1.1
-
-			return pos
-		}
-
 		scroll(state, a) {
 			this.scrollState = state
 
@@ -183,60 +168,31 @@ const sprite = {
 				scrollX = a - this.pos.x
 		}
 
-		collide(pos,jump) {
-			var push = {
-				gen: function (xy, rev, canJump = false) { //rev stands for reverse
-					return function (pos){
-						let i = Math[rev ? 'ceil' : 'floor'](pos[xy] / 16) * 16
-						if (
-							(rev ? pos : pos.last)[xy] <= i &&
-							(rev ? pos.last : pos)[xy] >= i
-						) {
-							pos[xy] = i
-							pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
-						}
-						return pos
-					}
-				}
+	},
+	enemy: class {
+		constructor(x, y) {
+			this.pos = {
+				x: x,
+				y: y,
+				xv: 0,
+				yv: 0
 			}
-			push.up = push.gen('y', false, true)
-			push.down = push.gen('y', true)
-			push.left = push.gen('x', false)
-			push.right = push.gen('x', true)
-
-			function pushif(dir, xo, yo) {
-				if (getTile(pos.x + xo, pos.y + yo).collide[dir])
-					pos = push[dir](pos)
-			}
-
-			var pushlist = [
-				['up', 0, 0],
-				['up', -16, 0],
-				['down', 0, -16],
-				['down', -16, -16],
-				['left', 0, 0],
-				['left', 0, -16],
-				['right', -16, 0],
-				['right', -16, -16]
-			]
-
-			for (let i in pushlist)
-				pushif(...pushlist[i])
-
-			function getTile(x, y) {
-				try {
-					if (x <= -16 || y <= -16) throw TypeError
-					return tile[level
-					[Math.ceil(y / 16)]
-					[Math.ceil(x / 16)]]
-				}
-				catch (TypeError) {
-					return tile[0]
-				}
-			}
-			return pos
+			this.dir = true //true = right
+			this.img = getImg('sprite', 'enemy')
 		}
 
+		update() {
+			this.pos.last = Object.assign({}, this.pos)
+			delete this.pos.last.last
+			this.pos = sScript.move(this.pos,
+				{ up: false, down: false, left: !this.dir, right: this.dir }
+			)
+
+			let i = sScript.collide(this.pos)
+			this.pos = i[0]
+			if (i[1].right || i[1].left)
+				this.dir = !this.dir
+		}
 	},
 	test: class {
 		constructor(x, y) {
