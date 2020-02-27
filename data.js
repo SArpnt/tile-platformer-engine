@@ -118,8 +118,11 @@ const tile = [
 			left: true,
 			right: true
 		},
-		onCollide: function (side, pos, sprite) {
-			console.log('collided!')
+		onCollide: function (side, pos, s) {
+			if (side == 'down') {
+				level[pos.y][pos.x] = 0
+				cSprites.push(new sprite.tile.bump(pos.x, pos.y, 10, side))
+			}
 		}
 	}
 ]
@@ -222,6 +225,32 @@ const sprite = {
 			}
 			//this.img.style = "opacity:" + (1 - (this.timer / 10))
 			this.timer++
+		}
+	},
+	tile: {
+		bump: class {
+			constructor(x, y, t, side) {
+				this.pos = {
+					tx: x,
+					ty: y,
+					x: x*16,
+					y: y*16,
+					sy: y*16,
+					yv: -1.5
+				}
+				this.tile = t
+				this.side = side
+				this.img = tile[t].img
+			}
+			update(sN) {
+				var p = this.pos
+				p.y += p.yv
+				p.yv += 0.2
+				if (p.y == p.sy) {
+					level[p.ty][p.tx] = this.tile
+					cSprites.splice(sN, 1)
+				}
+			}
 		}
 	}
 }

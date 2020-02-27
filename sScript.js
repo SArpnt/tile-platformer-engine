@@ -18,7 +18,7 @@ sScript = {
 						pos[xy] = i
 						pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
 						collisions[dir] = true
-						if (tile.onCollide) tile.onCollide(dir,tile.pos,null)
+						if (tile.onCollide) tile.onCollide(dir, tile.pos, null)
 					}
 					return pos
 				}
@@ -71,10 +71,10 @@ sScript = {
 	getTile(x, y) {
 		try {
 			if (x <= 0 || y <= 0) throw TypeError
-			let tPos = [Math.floor(x / 16), Math.floor(y / 16)]
+			let tPos = { x: Math.floor(x / 16), y: Math.floor(y / 16) }
 			let i = tile[level
-			[tPos[1]]
-			[tPos[0]]]
+			[tPos.y]
+			[tPos.x]]
 			if (!i) throw TypeError
 			i.pos = tPos
 			return i
