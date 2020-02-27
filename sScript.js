@@ -18,7 +18,7 @@ sScript = {
 						pos[xy] = i
 						pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
 						collisions[dir] = true
-						if (tile.onCollide) tile.onCollide(tile.pos,null,dir)
+						if (tile.onCollide) tile.onCollide(dir,tile.pos,null)
 					}
 					return pos
 				}

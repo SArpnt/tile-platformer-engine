@@ -18,18 +18,7 @@ function step() {
 
 function runSprites() {
 	for (let sN in cSprites) { //sN is spriteNumber
-		let i = cSprites[sN].update()
-		if (i)
-			for (x in i) {
-				switch (i[x][0]) {
-					case 'kill':
-					case 'unload':
-						cSprites.splice(sN, 1)
-						break
-					case 'spawn':
-						cSprites.push(new i[x][1](...i[x].slice(2)))
-				}
-			}
+		let i = cSprites[sN].update(sN)
 	}
 }
 

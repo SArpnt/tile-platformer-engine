@@ -118,7 +118,7 @@ const tile = [
 			left: true,
 			right: true
 		},
-		onCollide: function (pos,sprite,side) {
+		onCollide: function (side, pos, sprite) {
 			console.log('collided!')
 		}
 	}
@@ -137,7 +137,7 @@ const sprite = {
 			this.img = getImg('sprite', 'player')
 		}
 
-		update() {
+		update(sN) {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
 			this.pos = sScript.move(this.pos, keyInput)
@@ -162,7 +162,7 @@ const sprite = {
 				else if (i < ((this.scrollState == -1) ? 184 : 72))
 					this.scroll(-1, 184)
 			}
-			return [['spawn', sprite.test, this.pos.x, this.pos.y + 8]]
+			cSprites.push(new sprite.test(this.pos.x, this.pos.y + 8))
 		}
 
 		scroll(state, a) {
@@ -193,7 +193,7 @@ const sprite = {
 			this.img = getImg('sprite', 'enemy')
 		}
 
-		update() {
+		update(sN) {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
 			this.pos = sScript.move(this.pos,
@@ -215,9 +215,11 @@ const sprite = {
 			this.timer = 0
 			this.img = getImg('sprite', 'test')
 		}
-		update() {
-			if (this.timer >= 5)
-				return [['kill']]
+		update(sN) {
+			if (this.timer >= 5) {
+				cSprites.splice(sN, 1)
+				return
+			}
 			//this.img.style = "opacity:" + (1 - (this.timer / 10))
 			this.timer++
 		}
