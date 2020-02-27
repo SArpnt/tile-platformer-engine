@@ -8,8 +8,8 @@ sScript = {
 		}
 
 		var push = {
-			gen: function (xy, rev, canJump = false) { //rev stands for reverse
-				return function (pos) {
+			gen: function (xy, rev, dir, canJump = false) { //rev stands for reverse
+				return function (pos, tile) {
 					let i = Math[rev ? 'ceil' : 'floor'](pos[xy] / 16) * 16
 					if (
 						(rev ? pos : pos.last)[xy] <= i &&
@@ -17,32 +17,34 @@ sScript = {
 					) {
 						pos[xy] = i
 						pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
+						collisions[dir] = true
+						if (tile.onCollide) tile.onCollide(tile.pos,null,dir)
 					}
 					return pos
 				}
 			}
 		}
-		push.up = push.gen('y', false, true)
-		push.down = push.gen('y', true)
-		push.left = push.gen('x', false)
-		push.right = push.gen('x', true)
+		push.up = push.gen('y', false, 'up', true)
+		push.down = push.gen('y', true, 'down')
+		push.left = push.gen('x', false, 'left')
+		push.right = push.gen('x', true, 'right')
 
 		function pushif(dir, xo, yo) {
-			if (sScript.getTile(pos.x + xo, pos.y + yo).collide[dir]) {
-				pos = push[dir](pos)
-				collisions[dir] = true
+			let tI = sScript.getTile(pos.x + xo, pos.y + yo)
+			if (tI.collide[dir]) {
+				pos = push[dir](pos, tI)
 			}
 		}
 
 		var pushlist = [
-			['up', 0, 0],
-			['up', -16, 0],
-			['down', 0, -16],
-			['down', -16, -16],
-			['left', 0, 0],
-			['left', 0, -16],
-			['right', -16, 0],
-			['right', -16, -16]
+			['up', 16, 16],
+			['up', 0, 16],
+			['down', 16, 0],
+			['down', 0, 0],
+			['left', 16, 16],
+			['left', 16, 0],
+			['right', 0, 16],
+			['right', 0, 0]
 		]
 
 		for (let i in pushlist)
@@ -68,10 +70,14 @@ sScript = {
 
 	getTile(x, y) {
 		try {
-			if (x <= -16 || y <= -16) throw TypeError
-			return tile[level
-			[Math.ceil(y / 16)]
-			[Math.ceil(x / 16)]]
+			if (x <= 0 || y <= 0) throw TypeError
+			let tPos = [Math.floor(x / 16), Math.floor(y / 16)]
+			let i = tile[level
+			[tPos[1]]
+			[tPos[0]]]
+			if (!i) throw TypeError
+			i.pos = tPos
+			return i
 		}
 		catch (TypeError) {
 			return tile[0]
