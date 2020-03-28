@@ -8,9 +8,19 @@ var compressedLevel = {
 		{ id: 1, x: 0, y: 0, xe: 6, ye: 14 },
 		{ id: 1, x: 7, y: 12, xe: 21, ye: 14 },
 		{ id: 0, x: 4, y: 7, xe: 6, ye: 10 },
-		{ id: 3, x: 0, y: 6, xe: 6, ye: 6 },
-		{ id: 4, x: 3, y: 9, xe: 3, ye: 10 },
-		{ id: 2, x: 2, y: 11, xe: 8, ye: 11 }
+		{ id: 3, x: 0, y: 6, xe: 6 },
+		{ id: 4, x: 3, y: 9, ye: 10 },
+		{ id: 2, x: 2, y: 11, xe: 8 },
+		{ id: 2, x: 10, y: 12, xe: 20 },
+		{ id: 6, x: 9, y: 11 },
+		{ id: 6, x: 21, y: 12 },
+		{ id: 4, x: 21, y: 13, ye: 14 },
+		{ id: 5, x: 18, y: 9, ye: 11 },
+		{ id: 2, x: 12, y: 8, xe: 14 },
+		{ id: 2, x: 1, y: 1 },
+		{ id: 2, x: 3, y: 4 },
+		{ id: 2, x: 6, y: 5 },
+		{ id: 10, x: 13, y: 4 }
 	]
 }
 function loadLevel(data, background = 0) {
@@ -19,12 +29,11 @@ function loadLevel(data, background = 0) {
 		level.push(Object.assign([], Array(data.x).fill(background)))
 	for (let i = 0; i < data.tiles.length; i++) {
 		let rect = data.tiles[i]
-		console.log(rect)
+		if (rect.xe === undefined) rect.xe = rect.x
+		if (rect.ye === undefined) rect.ye = rect.y
 		for (let y = rect.y; y <= rect.ye; y++)
-			for (let x = rect.x; x <= rect.xe; x++) {
-				console.log(`level[${y}][${x}] = ${rect.id}`)
+			for (let x = rect.x; x <= rect.xe; x++)
 				level[y][x] = rect.id
-			}
 	}
 	return level
 }
