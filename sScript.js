@@ -69,9 +69,10 @@ var sScript = {
 		}
 
 		if (op.xg) {
-			let side = op.xs > 0 ? 'left' : 'right'
+			let flip = op.xs > 0
+			let side = flip ? 'left' : 'right'
 			if (pos.collisions[side] && dir[side]) pos.xv = op.jump //jump
-			pos.xv += op.xs * (0.1 - (dir[side] * Math.max(-1 - pos.xv, 0) / 30)) //gravity is reduced on ascent while holding up for higher jumps
+			pos.xv += op.xs * (0.1 - (dir[side] * Math.max(-1 - pos.xv * (flip ? 1 : -1), 0) / 30)) //gravity is reduced on ascent while holding up for higher jumps
 		} else {
 			if (dir.left) // walk/run
 				pos.xv -= (.1 + keyInput.sprint * .05) * op.xs
@@ -79,9 +80,10 @@ var sScript = {
 				pos.xv += (.1 + keyInput.sprint * .05) * op.xs
 		}
 		if (op.yg) {
-			let side = op.xs > 0 ? 'up' : 'down'
+			let flip = op.ys > 0
+			let side = flip ? 'up' : 'down'
 			if (pos.collisions[side] && dir[side]) pos.yv = op.jump
-			pos.yv += op.ys * (0.1 - (dir[side] * Math.max(-1 - pos.yv, 0) / 30))
+			pos.yv += op.ys * (0.1 - (dir[side] * Math.max(-1 - pos.yv * (flip ? 1 : -1), 0) / 30))
 		} else {
 			if (dir.up) // walk/run
 				pos.yv -= (.1 + keyInput.sprint * .05) * op.ys
