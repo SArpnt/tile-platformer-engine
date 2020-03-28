@@ -54,7 +54,7 @@ var sScript = {
 		return pos
 	},
 
-	move(pos, dir, op = {}) {
+	move(pos, input, op = {}) {
 		{
 			opDefault = {
 				xs: 1,
@@ -71,24 +71,24 @@ var sScript = {
 		if (op.xg) {
 			let flip = op.xs > 0
 			let side = flip ? 'left' : 'right'
-			if (pos.collisions[side] && dir[side]) pos.xv = op.jump //jump
-			pos.xv += op.xs * (0.1 - (dir[side] * Math.max(-1 - pos.xv * (flip ? 1 : -1), 0) / 30)) //gravity is reduced on ascent while holding up for higher jumps
+			if (pos.collisions[side] && input[side]) pos.xv = op.jump //jump
+			pos.xv += op.xs * (0.1 - (input[side] * Math.max(-1 - pos.xv * (flip ? 1 : -1), 0) / 30)) //gravity is reduced on ascent while holding up for higher jumps
 		} else {
-			if (dir.left) // walk/run
+			if (input.left) // walk/run
 				pos.xv -= (.1 + keyInput.sprint * .05) * op.xs
-			if (dir.right)
+			if (input.right)
 				pos.xv += (.1 + keyInput.sprint * .05) * op.xs
 		}
 		if (op.yg) {
 			let flip = op.ys > 0
 			let side = flip ? 'up' : 'down'
-			if (pos.collisions[side] && dir[side]) pos.yv = op.jump
-			pos.yv += op.ys * (0.1 - (dir[side] * Math.max(-1 - pos.yv * (flip ? 1 : -1), 0) / 30))
+			if (pos.collisions[side] && input[side]) pos.yv = op.jump
+			pos.yv += op.ys * (0.1 - (input[side] * Math.max(-1 - pos.yv * (flip ? 1 : -1), 0) / 30))
 		} else {
-			if (dir.up) // walk/run
-				pos.yv -= (.1 + keyInput.sprint * .05) * op.ys
-			if (dir.down)
-				pos.yv += (.1 + keyInput.sprint * .05) * op.ys
+			if (input.up) // walk/run
+				pos.yv -= (.1 + input.sprint * .05) * op.ys
+			if (input.down)
+				pos.yv += (.1 + input.sprint * .05) * op.ys
 		}
 
 		pos.y += pos.yv

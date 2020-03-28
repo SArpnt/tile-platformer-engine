@@ -14,7 +14,6 @@ var cSprites = [
 		scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level[0].length * -16) + 320)) //keep scrolling in boundaries and round
 		scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.length * -16) + 240))
 
-		window.setTimeout(step, 8) //125 tps
 		$("#tps")[0].innerHTML = Math.round(1000 / (performance.now() - tpsC))
 		tpsC = performance.now()
 	}
@@ -95,5 +94,5 @@ function press(v) {
 	}
 }
 
-step()
+window.setInterval(step,8) // 125 tps
 requestAnimationFrame(draw)

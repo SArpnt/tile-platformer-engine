@@ -233,7 +233,7 @@ const sprite = {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
 			this.pos = sScript.move(this.pos,
-				{ up: false, down: false, left: !this.dir, right: this.dir }
+				{ up: false, down: false, left: !this.dir, right: this.dir, sprint: false }
 			)
 
 			this.pos = sScript.collide(this.pos)
