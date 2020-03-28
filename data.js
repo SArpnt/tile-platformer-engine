@@ -1,7 +1,37 @@
 var scrollX = 0
 var scrollY = 0
 
-const level = [
+var compressedLevel = {
+	x: 27,
+	y: 15,
+	tiles: [
+		{ id: 1, x: 0, y: 0, xe: 6, ye: 14 },
+		{ id: 1, x: 7, y: 12, xe: 21, ye: 14 },
+		{ id: 0, x: 4, y: 7, xe: 6, ye: 10 },
+		{ id: 3, x: 0, y: 6, xe: 6, ye: 6 },
+		{ id: 4, x: 3, y: 9, xe: 3, ye: 10 },
+		{ id: 2, x: 2, y: 11, xe: 8, ye: 11 }
+	]
+}
+function loadLevel(data, background = 0) {
+	var level = []
+	for (let y = 0; y < data.y; y++)
+		level.push(Object.assign([], Array(data.x).fill(background)))
+	for (let i = 0; i < data.tiles.length; i++) {
+		let rect = data.tiles[i]
+		console.log(rect)
+		for (let y = rect.y; y <= rect.ye; y++)
+			for (let x = rect.x; x <= rect.xe; x++) {
+				console.log(`level[${y}][${x}] = ${rect.id}`)
+				level[y][x] = rect.id
+			}
+	}
+	return level
+}
+var level = loadLevel(compressedLevel)
+console.log(level)
+/*
+var level = [
 	[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[1, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -18,6 +48,7 @@ const level = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0]
 ]
+*/
 
 const tile = [
 	{
@@ -134,7 +165,13 @@ const sprite = {
 				x: x,
 				y: y,
 				xv: 0,
-				yv: 0
+				yv: 0,
+				collisions: {
+					up: false,
+					down: false,
+					left: false,
+					right: false
+				}
 			}
 			this.scrollState = 0 //1 is right
 			this.img = getImg('sprite', 'player')
@@ -144,7 +181,7 @@ const sprite = {
 			this.pos.last = Object.assign({}, this.pos)
 			delete this.pos.last.last
 			this.pos = sScript.move(this.pos, keyInput)
-			this.pos = sScript.collide(this.pos, keyInput.up)[0]
+			this.pos = sScript.collide(this.pos)
 
 			{
 				if ((() => {
@@ -190,7 +227,13 @@ const sprite = {
 				x: x,
 				y: y,
 				xv: 0,
-				yv: 0
+				yv: 0,
+				collisions: {
+					up: false,
+					down: false,
+					left: false,
+					right: false
+				}
 			}
 			this.dir = true //true = right
 			this.img = getImg('sprite', 'enemy')
@@ -203,9 +246,8 @@ const sprite = {
 				{ up: false, down: false, left: !this.dir, right: this.dir }
 			)
 
-			let i = sScript.collide(this.pos)
-			this.pos = i[0]
-			if (i[1].right || i[1].left)
+			this.pos = sScript.collide(this.pos)
+			if (this.pos.collisions.right || this.pos.collisions.left)
 				this.dir = !this.dir
 		}
 	},
@@ -233,9 +275,9 @@ const sprite = {
 				this.pos = {
 					tx: x,
 					ty: y,
-					x: x*16,
-					y: y*16,
-					sy: y*16,
+					x: x * 16,
+					y: y * 16,
+					sy: y * 16,
 					yv: -1.5
 				}
 				this.tile = t

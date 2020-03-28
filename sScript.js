@@ -1,5 +1,5 @@
-sScript = {
-	collide(pos, jump = false) {
+var sScript = {
+	collide(pos) {
 		var collisions = {
 			up: false,
 			down: false,
@@ -8,7 +8,7 @@ sScript = {
 		}
 
 		var push = {
-			gen: function (xy, rev, dir, canJump = false) { //rev stands for reverse
+			gen: function (xy, rev, dir) { //rev stands for reverse
 				return function (pos, tile) {
 					let i = Math[rev ? 'ceil' : 'floor'](pos[xy] / 16) * 16
 					if (
@@ -16,7 +16,7 @@ sScript = {
 						(rev ? pos.last : pos)[xy] >= i
 					) {
 						pos[xy] = i
-						pos[xy + 'v'] = (canJump ? (jump ? -3 : 0) : 0) //jump
+						pos[xy + 'v'] = 0
 						collisions[dir] = true
 						if (tile.onCollide) tile.onCollide(dir, tile.pos, null)
 					}
@@ -24,7 +24,7 @@ sScript = {
 				}
 			}
 		}
-		push.up = push.gen('y', false, 'up', true)
+		push.up = push.gen('y', false, 'up')
 		push.down = push.gen('y', true, 'down')
 		push.left = push.gen('x', false, 'left')
 		push.right = push.gen('x', true, 'right')
@@ -50,20 +50,51 @@ sScript = {
 		for (let i in pushlist)
 			pushif(...pushlist[i])
 
-		return [pos, collisions]
+		pos.collisions = collisions
+		return pos
 	},
 
-	move(pos, dir) {
-		pos.yv += 0.1 - (dir.up * Math.max(-1 - pos.yv, 0) / 30) //gravity (reduced on ascent while holding up for higher jumps)
+	move(pos, dir, op = {}) {
+		{
+			opDefault = {
+				xs: 1,
+				ys: 1,
+				xg: false,
+				yg: true,
+				friction: 1.1,
+				jump: -3
+			}
+			for (let i in opDefault)
+				if (op[i] === undefined) op[i] = opDefault[i]
+		}
 
-		if (dir.left) // walk/run
-			pos.xv -= 0.1 + keyInput.sprint * 0.05
-		if (dir.right)
-			pos.xv += 0.1 + keyInput.sprint * 0.05
+		if (op.xg) {
+			let side = op.xs > 0 ? 'left' : 'right'
+			if (pos.collisions[side] && dir[side]) pos.xv = op.jump //jump
+			pos.xv += op.xs * (0.1 - (dir[side] * Math.max(-1 - pos.xv, 0) / 30)) //gravity is reduced on ascent while holding up for higher jumps
+		} else {
+			if (dir.left) // walk/run
+				pos.xv -= (.1 + keyInput.sprint * .05) * op.xs
+			if (dir.right)
+				pos.xv += (.1 + keyInput.sprint * .05) * op.xs
+		}
+		if (op.yg) {
+			let side = op.xs > 0 ? 'up' : 'down'
+			if (pos.collisions[side] && dir[side]) pos.yv = op.jump
+			pos.yv += op.ys * (0.1 - (dir[side] * Math.max(-1 - pos.yv, 0) / 30))
+		} else {
+			if (dir.up) // walk/run
+				pos.yv -= (.1 + keyInput.sprint * .05) * op.ys
+			if (dir.down)
+				pos.yv += (.1 + keyInput.sprint * .05) * op.ys
+		}
 
 		pos.y += pos.yv
 		pos.x += pos.xv
-		pos.xv /= 1.1
+		{
+			if (!op.xg) pos.xv /= op.friction
+			if (!op.yg) pos.yv /= op.friction
+		}
 
 		return pos
 	},
