@@ -1,15 +1,13 @@
 'use strict';
-const TILE_WIDTH = 16;
-const TILE_HEIGHT = 16;
+TILE_WIDTH = 16;
+TILE_HEIGHT = 16;
 
-var assets = {};
-
-let compressedLevel = {
+compressedLevel = {
 	width: 27,
 	height: 15,
 	assets: [0, 1],
 	sprites: [
-		['Player', 64, 152],
+		['Player', 64, 160],
 		['Enemy', 96, 160],
 	],
 	tiles: [
@@ -31,46 +29,8 @@ let compressedLevel = {
 		{ id: 10, x: 13, y: 4 }
 	]
 };
-let Level;
-{
-	function ndArray(bg, ...dim) {
-		if (dim.length) {
-			let a = [],
-				l = dim[0],
-				d = dim.slice(1);
-			for (let i = 0; i < l; i++)
-				a.push(ndArray(bg, ...d));
-			return a;
-		} else
-			return bg;
-	};
-	Level = function (data, bg = 0) {
-		this.width = data.width;
-		this.height = data.height;
-		this.sprites = data.sprites;
-		this.assets = data.assets;
 
-		for (let s of data.assets)
-			if (!assets[s]) {
-				let i = document.createElement('img');
-				i.src = `assets/${s}.png`;
-				document.getElementById('assets').appendChild(i);
-				assets[s] = i;
-			}
-
-		this.tiles = ndArray(bg, this.height, data.width);
-		for (let rect of data.tiles) {
-			rect.xe = rect.xe || rect.x;
-			rect.ye = rect.ye || rect.y;
-			for (let y = rect.y; y <= rect.ye; y++)
-				for (let x = rect.x; x <= rect.xe; x++)
-					this.tiles[y][x] = rect.id;
-		}
-	};
-}
-var level = new Level(compressedLevel);
-
-const tile = [
+tile = [
 	{
 		name: 'empty',
 		img: [1, 0, 0],
@@ -173,10 +133,7 @@ const tile = [
 	}
 ];
 
-var scrollX = 0;
-var scrollY = 0;
-
-const sprite = {
+sprite = {
 	Player: class {
 		constructor(x, y) {
 			this.pos = {
