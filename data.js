@@ -1,9 +1,17 @@
-var scrollX = 0
-var scrollY = 0
+'use strict';
+const TILE_WIDTH = 16;
+const TILE_HEIGHT = 16;
 
-var compressedLevel = {
-	x: 27,
-	y: 15,
+var assets = {};
+
+let compressedLevel = {
+	width: 27,
+	height: 15,
+	assets: [0, 1],
+	sprites: [
+		['Player', 64, 152],
+		['Enemy', 96, 160],
+	],
 	tiles: [
 		{ id: 1, x: 0, y: 0, xe: 6, ye: 14 },
 		{ id: 1, x: 7, y: 12, xe: 21, ye: 14 },
@@ -22,45 +30,59 @@ var compressedLevel = {
 		{ id: 2, x: 6, y: 5 },
 		{ id: 10, x: 13, y: 4 }
 	]
+};
+let Level;
+{
+	function ndArray(bg, ...dim) {
+		if (dim.length) {
+			let a = [],
+				l = dim[0],
+				d = dim.slice(1);
+			for (let i = 0; i < l; i++)
+				a.push(ndArray(bg, ...d));
+			return a;
+		} else
+			return bg;
+	};
+	Level = function (data, bg = 0) {
+		this.width = data.width;
+		this.height = data.height;
+		this.sprites = data.sprites;
+		this.assets = data.assets;
+
+		for (let s of data.assets)
+			if (!assets[s]) {
+				let i = document.createElement('img');
+				i.src = `assets/${s}.png`;
+				document.getElementById('assets').appendChild(i);
+				assets[s] = i;
+			}
+
+		this.tiles = ndArray(bg, this.height, data.width);
+		for (let rect of data.tiles) {
+			rect.xe = rect.xe || rect.x;
+			rect.ye = rect.ye || rect.y;
+			for (let y = rect.y; y <= rect.ye; y++)
+				for (let x = rect.x; x <= rect.xe; x++)
+					this.tiles[y][x] = rect.id;
+		}
+	};
 }
-function loadLevel(data, background = 0) {
-	var level = []
-	for (let y = 0; y < data.y; y++)
-		level.push(Object.assign([], Array(data.x).fill(background)))
-	for (let i = 0; i < data.tiles.length; i++) {
-		let rect = data.tiles[i]
-		if (rect.xe === undefined) rect.xe = rect.x
-		if (rect.ye === undefined) rect.ye = rect.y
-		for (let y = rect.y; y <= rect.ye; y++)
-			for (let x = rect.x; x <= rect.xe; x++)
-				level[y][x] = rect.id
-	}
-	return level
-}
-var level = loadLevel(compressedLevel)
-console.log(level)
+var level = new Level(compressedLevel);
 
 const tile = [
 	{
 		name: 'empty',
-		collide: {
-			up: false,
-			down: false,
-			left: false,
-			right: false
-		}
+		img: [1, 0, 0],
 	},
 	{
 		name: 'dirt',
-		collide: {
-			up: false,
-			down: false,
-			left: false,
-			right: false
-		}
+		img: [1, 2, 1],
+		collide: false,
 	},
 	{
 		name: 'floor',
+		img: [1, 2, 0],
 		collide: {
 			up: true,
 			down: false,
@@ -70,6 +92,7 @@ const tile = [
 	},
 	{
 		name: 'ceiling',
+		img: [1, 2, 2],
 		collide: {
 			up: false,
 			down: true,
@@ -79,6 +102,7 @@ const tile = [
 	},
 	{
 		name: 'Rwall',
+		img: [1, 3, 1],
 		collide: {
 			up: false,
 			down: false,
@@ -88,6 +112,7 @@ const tile = [
 	},
 	{
 		name: 'Lwall',
+		img: [1, 1, 1],
 		collide: {
 			up: false,
 			down: false,
@@ -97,6 +122,7 @@ const tile = [
 	},
 	{
 		name: 'RUcorner',
+		img: [1, 3, 0],
 		collide: {
 			up: true,
 			down: false,
@@ -106,6 +132,7 @@ const tile = [
 	},
 	{
 		name: 'LUcorner',
+		img: [1, 1, 0],
 		collide: {
 			up: true,
 			down: false,
@@ -115,6 +142,7 @@ const tile = [
 	},
 	{
 		name: 'RDcorner',
+		img: [1, 3, 2],
 		collide: {
 			up: false,
 			down: true,
@@ -124,6 +152,7 @@ const tile = [
 	},
 	{
 		name: 'LDcorner',
+		img: [1, 1, 2],
 		collide: {
 			up: false,
 			down: true,
@@ -133,23 +162,22 @@ const tile = [
 	},
 	{
 		name: 'bumpBox',
-		collide: {
-			up: true,
-			down: true,
-			left: true,
-			right: true
-		},
-		onCollide: function (side, pos, s) {
+		img: [1, 0, 1],
+		collide: true,
+		onCollide(side, pos, s) {
 			if (side == 'down') {
-				level[pos.y][pos.x] = 0
-				cSprites.push(new sprite.tile.bump(pos.x, pos.y, 10, side))
+				sScript.setTile(pos.x, pos.y, 0, false);
+				cSprites.push(new sprite.tile.Bump(pos.x, pos.y, 10, side));
 			}
 		}
 	}
-]
+];
+
+var scrollX = 0;
+var scrollY = 0;
 
 const sprite = {
-	player: class {
+	Player: class {
 		constructor(x, y) {
 			this.pos = {
 				x: x,
@@ -161,57 +189,65 @@ const sprite = {
 					down: false,
 					left: false,
 					right: false
-				}
-			}
-			this.scrollState = 0 //1 is right
-			this.img = getImg('sprite', 'player')
+				},
+				hitboxes: [
+					{
+						x: 0,
+						y: 0,
+						width: 16,
+						height: 16,
+					}
+				],
+			};
+			this.scrollState = 0; // 1 is right
+			this.img = [0, 0, 0, 16, 16];
 		}
 
 		update(sN) {
-			this.pos.last = Object.assign({}, this.pos)
-			delete this.pos.last.last
-			this.pos = sScript.move(this.pos, keyInput)
-			this.pos = sScript.collide(this.pos)
+			this.pos.last = Object.assign({}, this.pos);
+			delete this.pos.last.last;
+			this.pos = sScript.move(this.pos, keyInput);
+			this.pos = sScript.collide(this.pos);
 
 			{
 				if ((() => {
-					switch (this.scrollState) { //reset scrolling when changing direction partly
+					switch (this.scrollState) { // reset scrolling when changing direction partly
 						case 1:
-							return this.pos.xv < 0
+							return this.pos.xv < 0;
 						case -1:
-							return this.pos.xv > 0
+							return this.pos.xv > 0;
 						default:
-							return false
+							return false;
 					}
-				})()) this.scrollState = 0
+				})()) this.scrollState = 0;
 
-				let i = this.pos.x + scrollX //player relative to camera
+				let i = this.pos.x + scrollX; // player relative to camera
 
-				if (i > ((this.scrollState == 1) ? 120 : 232)) //past scroll border
-					this.scroll(1, 120)
+				if (i > ((this.scrollState == 1) ? 120 : 232)) // past scroll border
+					this.scroll(1, 120);
 				else if (i < ((this.scrollState == -1) ? 184 : 72))
-					this.scroll(-1, 184)
+					this.scroll(-1, 184);
 			}
-			cSprites.push(new sprite.test(this.pos.x, this.pos.y + 8))
+			cSprites.push(new sprite.particle.Star(this.pos.x + 4, this.pos.y + 12));
 		}
 
 		scroll(state, a) {
-			this.scrollState = state
+			this.scrollState = state;
 
-			scrollX += (//scroll camera to final position based on movement
-				(a - this.pos.x - scrollX) //final camera position
-					> 0 ? Math.max : Math.min)(this.pos.xv * -2.5, 0)
+			scrollX += ( // scroll camera to final position based on movement
+				(a - this.pos.x - scrollX) // final camera position
+					> 0 ? Math.max : Math.min)(this.pos.xv * -2.5, 0);
 
-			if (//jitter fix
+			if ( // jitter fix
 				state == 1 ?
 					this.pos.x + scrollX < a :
 					this.pos.x + scrollX > a
 			)
-				scrollX = a - this.pos.x
+				scrollX = a - this.pos.x;
 		}
 
 	},
-	enemy: class {
+	Enemy: class {
 		constructor(x, y) {
 			this.pos = {
 				x: x,
@@ -223,76 +259,77 @@ const sprite = {
 					down: false,
 					left: false,
 					right: false
-				}
-			}
-			this.dir = true //true = right
-			this.img = getImg('sprite', 'enemy')
+				},
+				hitboxes: [
+					{
+						x: 0,
+						y: 0,
+						width: 16,
+						height: 16,
+					}
+				],
+			};
+			this.dir = true; // true = right
+			this.img = [0, 16, 0, 16, 16];
 		}
 
 		update(sN) {
-			this.pos.last = Object.assign({}, this.pos)
-			delete this.pos.last.last
+			this.pos.last = Object.assign({}, this.pos);
+			delete this.pos.last.last;
 			this.pos = sScript.move(this.pos,
 				{ up: false, down: false, left: !this.dir, right: this.dir, sprint: false }
-			)
+			);
 
-			this.pos = sScript.collide(this.pos)
+			this.pos = sScript.collide(this.pos);
 			if (this.pos.collisions.right || this.pos.collisions.left)
-				this.dir = !this.dir
+				this.dir = !this.dir;
 		}
 	},
-	test: class {
-		constructor(x, y) {
-			this.pos = {
-				x: x,
-				y: y
+	particle: {
+		Star: class {
+			constructor(x, y) {
+				this.pos = {
+					x: x,
+					y: y,
+				};
+				this.timer = 0;
+				this.img = [0, 32, 0, 8, 8];
 			}
-			this.timer = 0
-			this.img = getImg('sprite', 'test')
-		}
-		update(sN) {
-			if (this.timer >= 5) {
-				cSprites.splice(sN, 1)
-				return
+			update(sN) {
+				if (this.timer >= 5) {
+					cSprites.splice(sN, 1);
+					return;
+				}
+				//this.img.style = "opacity:" + (1 - (this.timer / 10))
+				this.timer++;
 			}
-			//this.img.style = "opacity:" + (1 - (this.timer / 10))
-			this.timer++
 		}
 	},
 	tile: {
-		bump: class {
+		Bump: class {
 			constructor(x, y, t, side) {
 				this.pos = {
 					tx: x,
 					ty: y,
-					x: x * 16,
-					y: y * 16,
-					sy: y * 16,
+					x: x * TILE_WIDTH,
+					y: y * TILE_HEIGHT,
+					sy: y * TILE_HEIGHT,
 					yv: -1.5
-				}
-				this.tile = t
-				this.side = side
-				this.img = tile[t].img
+				};
+				this.tile = t;
+				this.side = side;
+				let i = tile[t].img;
+				this.img = [i[0], i[1] * TILE_WIDTH, i[2] * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT];
 			}
 			update(sN) {
-				var p = this.pos
-				p.y += p.yv
-				p.yv += 0.2
+				var p = this.pos;
+				p.y += p.yv;
+				p.yv += 0.2;
 				if (p.y == p.sy) {
-					level[p.ty][p.tx] = this.tile
-					cSprites.splice(sN, 1)
+					sScript.setTile(p.tx, p.ty, this.tile, false);
+					cSprites.splice(sN, 1);
 				}
 			}
 		}
 	}
-}
-
-function getImg(type, img) {
-	let i = document.createElement('img')
-	i.src = "assets/" + type + "/" + img + '.png'
-	return i
-}
-
-for (let x in tile) {
-	tile[x].img = getImg('tile', tile[x].name)
-}
+};
