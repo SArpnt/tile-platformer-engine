@@ -19,11 +19,11 @@ var canvas,
 		sprint: false
 	};
 
-
 let tpsC,
 	fpsC,
 	tpsElem,
-	fpsElem;
+	fpsElem,
+	assetElem;
 
 function step() {
 	runSprites();
@@ -31,9 +31,11 @@ function step() {
 	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + canvas.width)); // keep scrolling in boundaries and round
 	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + canvas.height));
 
-	let now = performance.now();
-	tpsElem.innerHTML = Math.round(1000 / (now - tpsC));
-	tpsC = now;
+	if (tpsElem) {
+		let now = performance.now();
+		tpsElem.innerHTML = Math.round(1000 / (now - tpsC));
+		tpsC = now;
+	}
 };
 function draw() {
 	ctx.fillStyle = "magenta"; // temporary bg
@@ -42,10 +44,11 @@ function draw() {
 	drawTiles(scrollX, scrollY);
 	drawSprites(scrollX, scrollY);
 
-	let now = performance.now();
-	fpsElem.innerHTML = Math.round(1000 / (now - fpsC)); // fps counter
-	fpsC = now;
-
+	if (fpsElem) {
+		let now = performance.now();
+		fpsElem.innerHTML = Math.round(1000 / (now - fpsC)); // fps counter
+		fpsC = now;
+	}
 	requestAnimationFrame(draw);
 };
 
@@ -131,7 +134,7 @@ function Level(data, bg = 0) {
 		if (!assets[s]) {
 			let i = document.createElement('img');
 			i.src = `assets/${s}.png`;
-			document.getElementById('assets').appendChild(i);
+			if (assetElem) assetElem.appendChild(i);
 			assets[s] = i;
 		}
 
@@ -145,11 +148,12 @@ function Level(data, bg = 0) {
 	}
 };
 
-function start() {
-	canvas = document.getElementById('canvas');
+function start(c, tps, fps, asset) {
+	canvas = c;
 	ctx = canvas.getContext('2d');
-	tpsElem = document.getElementById('tps');
-	fpsElem = document.getElementById('fps');
+	tpsElem = tps;
+	fpsElem = fps;
+	assetElem = asset;
 
 	level = new Level(compressedLevel);
 
@@ -159,8 +163,8 @@ function start() {
 	addEventListener("keydown", press(true));
 	addEventListener("keyup", press(false));
 
-	tpsC = performance.now();
-	fpsC = performance.now();
+	if (tps) tpsC = performance.now();
+	if (fps) fpsC = performance.now();
 	setInterval(step, 8); // 125 tps
 	requestAnimationFrame(draw);
 }

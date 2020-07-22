@@ -5,7 +5,12 @@
 	<script src="sScript.js"></script>
 </head>
 
-<body onload="start()">
+<body onload="start(
+	document.getElementById('canvas'),
+	document.getElementById('tps'),
+	document.getElementById('fps'),
+	document.getElementById('assets')
+)">
 	<div style="display: flex; flex-direction: row; max-width: 100%;">
 		<canvas id="canvas" width="320" height="240" style="width: 640; height: 480; image-rendering: pixelated;"></canvas>
 		<div id="assets" style="background: darkmagenta; display: flex; flex-direction: column; flex-wrap: wrap;"></div>
