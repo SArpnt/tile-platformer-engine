@@ -3,17 +3,37 @@
 <head>
 	<script src="script.js"></script>
 	<script src="sScript.js"></script>
+	<style>
+		canvas.zoom-2x {
+			width: 640;
+			height: 480;
+			image-rendering: pixelated;
+		}
+		.zoom-2x img {
+			zoom: 2;
+			image-rendering: pixelated;
+		}
+		.flex-column {
+			display: flex;
+			flex-direction: column;
+			flex-wrap: wrap;
+		}
+	</style>
 </head>
 
-<body onload="start(
-	document.getElementById('canvas'),
-	document.getElementById('tps'),
-	document.getElementById('fps'),
-	document.getElementById('assets')
-)">
+<body onload="start({
+	canvas: document.getElementById('canvas'),
+	tps: document.getElementById('tps'),
+	fps: document.getElementById('fps'),
+	asset: document.getElementById('asset'),
+	tile: document.getElementById('tile'),
+	sprite: document.getElementById('sprite'),
+})">
 	<div style="display: flex; flex-direction: row; max-width: 100%;">
-		<canvas id="canvas" width="320" height="240" style="width: 640; height: 480; image-rendering: pixelated;"></canvas>
-		<div id="assets" style="background: darkmagenta; display: flex; flex-direction: column; flex-wrap: wrap;"></div>
+		<canvas id="canvas" width="320" height="240" class="zoom-2x"></canvas>
+		<div id="asset" class="zoom-2x flex-column" style="background: darkmagenta;"></div>
+		<div id="tile" class="zoom-2x flex-column" style="background: darkred;"></div>
+		<div id="sprite" class="zoom-2x flex-column" style="background: darkorange;"></div>
 	</div>
 	<div>FPS: <span id="fps"></span></div>
 	<div>TPS: <span id="tps"></span></div>

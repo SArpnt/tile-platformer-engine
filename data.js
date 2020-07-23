@@ -124,7 +124,7 @@ tile = [
 		name: 'bumpBox',
 		img: [1, 0, 1],
 		collide: true,
-		onCollide(side, pos, s) {
+		onCollide(side, pos) {
 			if (side == 'down') {
 				sScript.setTile(pos.x, pos.y, 0, false);
 				cSprites.push(new sprite.tile.Bump(pos.x, pos.y, 10, side));
@@ -202,7 +202,6 @@ sprite = {
 			)
 				scrollX = a - this.pos.x;
 		}
-
 	},
 	Enemy: class {
 		constructor(x, y) {

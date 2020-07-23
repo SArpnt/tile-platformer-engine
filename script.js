@@ -23,7 +23,9 @@ let tpsC,
 	fpsC,
 	tpsElem,
 	fpsElem,
-	assetElem;
+	assetElem,
+	tileElem,
+	spriteElem;
 
 function step() {
 	runSprites();
@@ -79,7 +81,6 @@ function copyTiles(ox, oy) {
 	);
 }
 function drawTile(t, x, y) {
-	console.log(t, x, y)
 	tilectx.clearRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
 	tilectx.drawImage(
 		assets[t.img[0]],
@@ -167,7 +168,13 @@ Level.prototype.onAssetsLoaded = function (callback) {
 	});
 };
 
-function start(c, tps, fps, asset) {
+function start({canvas: c, tps, fps, asset, tile: te, sprite: se}) {
+	tpsElem = tps;
+	fpsElem = fps;
+	assetElem = asset;
+	tileElem = te;
+	spriteElem = se;
+
 	level = new Level(compressedLevel);
 
 	for (let s of level.sprites)
@@ -179,19 +186,15 @@ function start(c, tps, fps, asset) {
 	if (c) ctx = c.getContext('2d', { alpha: false });
 	tilectx = (new OffscreenCanvas(level.width * TILE_WIDTH, level.height * TILE_HEIGHT)).getContext('2d', { willReadFrequently: true });
 
-	tpsElem = tps;
-	fpsElem = fps;
-	assetElem = asset;
-
-	if (c) ctx.canvas.style.cursor = 'progress';
+	if (ctx) ctx.canvas.style.cursor = 'progress';
 	level.onAssetsLoaded(function () {
-		if (c) ctx.canvas.style.cursor = '';
+		if (ctx) ctx.canvas.style.cursor = '';
 		updateTileCanvas();
 
 		if (tps) tpsC = performance.now();
 		if (fps) fpsC = performance.now();
 
 		setInterval(step, 8); // 125 tps
-		if (c) requestAnimationFrame(draw);
+		if (ctx) requestAnimationFrame(draw);
 	});
 }
