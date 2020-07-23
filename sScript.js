@@ -8,65 +8,47 @@ var sScript = {
 			right: false
 		};
 
-		var push = {
-			gen: function (xy, rev, dir) { // this function is used to make a push function for every direction
-				const TS = xy == 'x' ? TILE_WIDTH : TILE_HEIGHT;
-				return function (pos, hpos, tile, tpos) { // the push function itself, sends player to tile edge if they have passed through it
-					let i = Math[rev ? 'ceil' : 'floor']((pos[xy] + hpos[xy]) / TS) * TS - hpos[xy];
-					if (
-						(rev ? pos : pos.last)[xy] <= i &&
-						(rev ? pos.last : pos)[xy] >= i
-					) {
-						if (cPos) pos[xy] = i;
-						if (cVel) pos[xy + 'v'] = 0;
-						collisions[dir] = true;
-						if (tCol && tile.onCollide) tile.onCollide(dir, tpos, null);
-					}
-					return pos;
-				};
-			}
-		};
-		push.up = push.gen('y', false, 'up'); // generate push scripts for every direction
-		push.down = push.gen('y', true, 'down');
-		push.left = push.gen('x', false, 'left');
-		push.right = push.gen('x', true, 'right');
-
-		function pushif(dir, x, y, xf, yf) { // push if tile collision is enabled and get information for push functions
-			if (xf && (pos.x + x) % 16 == 0) x -= TILE_WIDTH; // fix rounding issues
-			if (yf && (pos.y + y) % 16 == 0) y -= TILE_HEIGHT;
-
-			let t = sScript.getTile(pos.x + x, pos.y + y, true);
-			if (t.tile.collide && (typeof t.tile.collide != 'object' || t.tile.collide[dir]))
-				pos = push[dir](pos, { x, y }, t.tile, t.pos);
-		}
-
-		let pushPoints = [];
-		for (let h of pos.hitboxes) { // make points along all hitbox edges to test
-			let c = h.collide || { up: true, down: true, left: true, right: true };
-
-			if (c.up || c.down) {
-				for (let x = h.x; x < h.width; x += TILE_WIDTH) {
-					if (c.down) pushPoints.push(['down', x, h.y]);
-					if (c.up) pushPoints.push(['up', x, h.height]);
+		if (pos.hitboxes) {
+			var push = {
+				gen: function (xy, rev, dir) { // this function is used to make a push function for every direction
+					const TS = xy == 'x' ? TILE_WIDTH : TILE_HEIGHT;
+					return function (pos, hpos, tile, tpos) { // the push function itself, sends player to tile edge if they have passed through it
+						let i = Math[rev ? 'ceil' : 'floor']((pos[xy] + hpos[xy]) / TS) * TS - hpos[xy];
+						if (
+							(rev ? pos : pos.last)[xy] <= i &&
+							(rev ? pos.last : pos)[xy] >= i
+						) {
+							if (cPos) pos[xy] = i;
+							if (cVel) pos[xy + 'v'] = 0;
+							collisions[dir] = true;
+							if (tCol && tile.onCollide) tile.onCollide(dir, tpos, null);
+						}
+						return pos;
+					};
 				}
-				if (c.down) pushPoints.push(['down', h.width - 1, h.y, true]); // these booleans mark to fix rounding issues
-				if (c.up) pushPoints.push(['up', h.width - 1, h.height, true]);
+			};
+			push.up = push.gen('y', false, 'up'); // generate push scripts for every direction
+			push.down = push.gen('y', true, 'down');
+			push.left = push.gen('x', false, 'left');
+			push.right = push.gen('x', true, 'right');
+
+			function pushif(dir, x, y, xf, yf) { // push if tile collision is enabled and get information for push functions
+				if (xf && (pos.x + x) % 16 == 0) x -= TILE_WIDTH; // fix rounding issues
+				if (yf && (pos.y + y) % 16 == 0) y -= TILE_HEIGHT;
+
+				let t = sScript.getTile(pos.x + x, pos.y + y, true);
+				if (t.tile.collide && (typeof t.tile.collide != 'object' || t.tile.collide[dir]))
+					pos = push[dir](pos, { x, y }, t.tile, t.pos);
 			}
-			if (c.left || c.right) {
-				for (let y = h.y; y < h.height; y += TILE_HEIGHT) {
-					if (c.right) pushPoints.push(['right', h.x, y]);
-					if (c.left) pushPoints.push(['left', h.width, y]);
-				}
-				if (c.right) pushPoints.push(['right', h.x, h.height - 1, false, true]);
-				if (c.left) pushPoints.push(['left', h.width, h.height - 1, false, true]);
-			}
+
+			let pushPoints = pos.hitboxes.reduce((a, e) => a = a.concat(e.pushPoints), []);
+
+			let sortOrder = { up: 0, left: 1, right: 2, down: 3 };
+			pushPoints.sort((a, b) => (sortOrder[a] - sortOrder[b])); // make collision order floors, then walls, then ceilings
+
+			for (let p of pushPoints) // test all pushPoints
+				pushif(...p);
 		}
-
-		let sortOrder = { up: 0, left: 1, right: 2, down: 3 };
-		pushPoints.sort((a, b) => (sortOrder[a] - sortOrder[b])); // make collision order floors, then walls, then ceilings
-
-		for (let p of pushPoints) // test all pushPoints
-			pushif(...p);
 
 		pos.collisions = collisions;
 		return pos;
@@ -149,5 +131,36 @@ var sScript = {
 			drawTile(tile[t], p.x, p.y);
 			return true;
 		} else return false;
+	},
+
+	hitbox: {
+		Rect: class {
+			constructor(x, y, width, height, collide = { up: true, down: true, left: true, right: true }) {
+				this.x = x;
+				this.y = y;
+				this.width = width;
+				this.height = height;
+				this.collide = collide;
+
+				this.pushPoints = [];
+
+				if (collide.up || collide.down) {
+					for (let h = x; h < width; h += TILE_WIDTH) {
+						if (collide.down) this.pushPoints.push(['down', h, y]);
+						if (collide.up) this.pushPoints.push(['up', h, height]);
+					}
+					if (collide.down) this.pushPoints.push(['down', width - 1, y, true]); // these booleans mark to fix rounding issues
+					if (collide.up) this.pushPoints.push(['up', width - 1, height, true]);
+				}
+				if (collide.left || collide.right) {
+					for (let v = y; v < height; v += TILE_HEIGHT) {
+						if (collide.right) this.pushPoints.push(['right', x, v]);
+						if (collide.left) this.pushPoints.push(['left', width, v]);
+					}
+					if (collide.right) this.pushPoints.push(['right', x, height - 1, false, true]);
+					if (collide.left) this.pushPoints.push(['left', width, height - 1, false, true]);
+				}
+			}
+		},
 	},
 };

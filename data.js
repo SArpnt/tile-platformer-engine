@@ -148,12 +148,7 @@ sprite = {
 					right: false
 				},
 				hitboxes: [
-					{
-						x: 0,
-						y: 0,
-						width: 16,
-						height: 16,
-					}
+					new sScript.hitbox.Rect(0, 0, 16, 16),
 				],
 			};
 			this.scrollState = 0; // 1 is right
@@ -217,12 +212,7 @@ sprite = {
 					right: false
 				},
 				hitboxes: [
-					{
-						x: 0,
-						y: 0,
-						width: 16,
-						height: 16,
-					}
+					new sScript.hitbox.Rect(0, 0, 16, 16),
 				],
 			};
 			this.dir = true; // true = right
