@@ -79,6 +79,8 @@ function copyTiles(ox, oy) {
 	);
 }
 function drawTile(t, x, y) {
+	console.log(t, x, y)
+	tilectx.clearRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
 	tilectx.drawImage(
 		assets[t.img[0]],
 		t.img[1] * TILE_WIDTH,
@@ -181,7 +183,9 @@ function start(c, tps, fps, asset) {
 	fpsElem = fps;
 	assetElem = asset;
 
+	if (c) ctx.canvas.style.cursor = 'progress';
 	level.onAssetsLoaded(function () {
+		if (c) ctx.canvas.style.cursor = '';
 		updateTileCanvas();
 
 		if (tps) tpsC = performance.now();
