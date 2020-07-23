@@ -1,6 +1,6 @@
 'use strict';
-var canvas,
-	ctx,
+var ctx,
+	tilectx,
 	scrollX = 0,
 	scrollY = 0,
 	level,
@@ -28,8 +28,8 @@ let tpsC,
 function step() {
 	runSprites();
 
-	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + canvas.width)); // keep scrolling in boundaries and round
-	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + canvas.height));
+	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + ctx.canvas.width)); // keep scrolling in boundaries and round
+	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + ctx.canvas.height));
 
 	if (tpsElem) {
 		let now = performance.now();
@@ -39,9 +39,9 @@ function step() {
 };
 function draw() {
 	ctx.fillStyle = "magenta"; // temporary bg
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-	drawTiles(scrollX, scrollY);
+	copyTiles(scrollX, scrollY);
 	drawSprites(scrollX, scrollY);
 
 	if (fpsElem) {
@@ -56,6 +56,7 @@ function runSprites() {
 	for (let sN in cSprites) // sN is spriteNumber
 		cSprites[sN].update(sN);
 }
+
 function drawSprites(ox, oy) {
 	for (let s of cSprites)
 		ctx.drawImage(
@@ -70,24 +71,33 @@ function drawSprites(ox, oy) {
 			s.img[4],
 		);
 }
-function drawTiles(ox, oy) {
-	for (let y = 0; y < level.height; y++)
-		for (let x = 0; x < level.width; x++) {
-			let t = sScript.getTile(x, y, false).tile;
-			ctx.drawImage(
-				assets[t.img[0]],
-				t.img[1] * TILE_WIDTH,
-				t.img[2] * TILE_HEIGHT,
-				TILE_WIDTH,
-				TILE_HEIGHT,
-				x * TILE_WIDTH + ox,
-				y * TILE_HEIGHT + oy,
-				TILE_WIDTH,
-				TILE_HEIGHT,
-			);
-		}
+function copyTiles(ox, oy) {
+	ctx.drawImage(
+		tilectx.canvas,
+		ox,
+		oy,
+	);
 }
-
+function drawTile(t, x, y) {
+	console.log(t, x, y)
+	tilectx.clearRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
+	tilectx.drawImage(
+		assets[t.img[0]],
+		t.img[1] * TILE_WIDTH,
+		t.img[2] * TILE_HEIGHT,
+		TILE_WIDTH,
+		TILE_HEIGHT,
+		x * TILE_WIDTH,
+		y * TILE_HEIGHT,
+		TILE_WIDTH,
+		TILE_HEIGHT,
+	);
+}
+function updateTileCanvas() {
+	for (let y = 0; y < level.height; y++)
+		for (let x = 0; x < level.width; x++)
+			drawTile(sScript.getTile(x, y, false).tile, x, y);
+}
 
 function press(v) {
 	return function (key) {
@@ -147,14 +157,17 @@ function Level(data, bg = 0) {
 				this.tiles[y][x] = rect.id;
 	}
 };
+Level.prototype.onAssetsLoaded = function (callback) {
+	let remaining = level.assets.length;
+	let rd = () => --remaining || callback(); // decrement remaining and then run callback if 0
+	level.assets.forEach(function (e) {
+		assets[e].complete ?
+			rd() :
+			assets[e].addEventListener('load', rd);
+	});
+};
 
 function start(c, tps, fps, asset) {
-	canvas = c;
-	ctx = canvas.getContext('2d');
-	tpsElem = tps;
-	fpsElem = fps;
-	assetElem = asset;
-
 	level = new Level(compressedLevel);
 
 	for (let s of level.sprites)
@@ -163,8 +176,22 @@ function start(c, tps, fps, asset) {
 	addEventListener("keydown", press(true));
 	addEventListener("keyup", press(false));
 
-	if (tps) tpsC = performance.now();
-	if (fps) fpsC = performance.now();
-	setInterval(step, 8); // 125 tps
-	requestAnimationFrame(draw);
+	if (c) ctx = c.getContext('2d', { alpha: false });
+	tilectx = (new OffscreenCanvas(level.width * TILE_WIDTH, level.height * TILE_HEIGHT)).getContext('2d', { willReadFrequently: true });
+
+	tpsElem = tps;
+	fpsElem = fps;
+	assetElem = asset;
+
+	if (c) ctx.canvas.style.cursor = 'progress';
+	level.onAssetsLoaded(function () {
+		if (c) ctx.canvas.style.cursor = '';
+		updateTileCanvas();
+
+		if (tps) tpsC = performance.now();
+		if (fps) fpsC = performance.now();
+
+		setInterval(step, 8); // 125 tps
+		if (c) requestAnimationFrame(draw);
+	});
 }

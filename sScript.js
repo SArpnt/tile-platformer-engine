@@ -146,6 +146,7 @@ var sScript = {
 			p.y < level.height
 		) {
 			level.tiles[p.y][p.x] = t;
+			drawTile(tile[t], p.x, p.y);
 			return true;
 		} else return false;
 	},
