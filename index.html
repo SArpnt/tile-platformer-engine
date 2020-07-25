@@ -4,8 +4,7 @@
 	<script src="script.js"></script>
 	<script src="sScript.js"></script>
 	<style>
-		.zoom-2x {
-			zoom: 2;
+		.pixel {
 			image-rendering: pixelated;
 		}
 		.flex-column {
@@ -17,6 +16,7 @@
 </head>
 
 <body onload="start({
+	zoom: 2,
 	canvas: document.getElementById('canvas'),
 	tps: document.getElementById('tps'),
 	fps: document.getElementById('fps'),
@@ -25,10 +25,10 @@
 	sprite: document.getElementById('sprite'),
 })">
 	<div style="display: flex; flex-direction: row; max-width: 100%;">
-		<canvas id="canvas" width="320" height="240" class="zoom-2x"></canvas>
-		<div id="asset" class="zoom-2x flex-column" style="background: darkmagenta;"></div>
-		<div id="tile" class="zoom-2x flex-column" style="background: darkred;"></div>
-		<div id="sprite" class="zoom-2x flex-column" style="background: darkorange;"></div>
+		<canvas id="canvas" width="320" height="240" class="pixel"></canvas>
+		<div id="asset" class="pixel flex-column" style="background: darkmagenta;"></div>
+		<div id="tile" class="pixel flex-column" style="background: darkred;"></div>
+		<div id="sprite" class="pixel flex-column" style="background: darkorange;"></div>
 	</div>
 	<div>FPS: <span id="fps"></span></div>
 	<div>TPS: <span id="tps"></span></div>

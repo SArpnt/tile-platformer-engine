@@ -168,7 +168,7 @@ Level.prototype.onAssetsLoaded = function (callback) {
 	});
 };
 
-function start({ step: doStep = true, draw: doDraw = true, canvas: c, tps, fps, asset, tile: te, sprite: se }) {
+function start({ step: doStep = true, draw: doDraw = true, zoom, canvas: c, tps, fps, asset, tile: te, sprite: se }) {
 	tpsElem = tps;
 	fpsElem = fps;
 	assetElem = asset;
@@ -185,7 +185,13 @@ function start({ step: doStep = true, draw: doDraw = true, canvas: c, tps, fps, 
 		addEventListener("keyup", press(false));
 	}
 	if (doDraw) {
-		if (c) ctx = c.getContext('2d', { alpha: false });
+		if (c) {
+			if (zoom) {
+				c.style.width = c.width * zoom;
+				c.style.height = c.height * zoom;
+			}
+			ctx = c.getContext('2d', { alpha: false });
+		}
 		tilectx = (new OffscreenCanvas(level.width * TILE_WIDTH, level.height * TILE_HEIGHT)).getContext('2d', { willReadFrequently: true });
 	}
 
