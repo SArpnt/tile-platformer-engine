@@ -9,7 +9,7 @@ var sScript = {
 		};
 
 		if (pos.hitboxes) {
-			var push = {
+			var push = { // all of this should me moved elsewhere and not done every time collision is ran
 				gen: function (xy, rev, dir) { // this function is used to make a push function for every direction
 					const TS = xy == 'x' ? TILE_WIDTH : TILE_HEIGHT;
 					return function (pos, hpos, tile, tpos) { // the push function itself, sends player to tile edge if they have passed through it

@@ -168,7 +168,7 @@ Level.prototype.onAssetsLoaded = function (callback) {
 	});
 };
 
-function start({step: rs = true, canvas: c, tps, fps, asset, tile: te, sprite: se}) {
+function start({calcs = true, draw = true, canvas: c, tps, fps, asset, tile: te, sprite: se}) {
 	tpsElem = tps;
 	fpsElem = fps;
 	assetElem = asset;
@@ -180,21 +180,21 @@ function start({step: rs = true, canvas: c, tps, fps, asset, tile: te, sprite: s
 	for (let s of level.sprites)
 		cSprites.push(new (s[0].split('.').reduce((a, b) => a[b], sprite))(...s.slice(1)));
 
-	addEventListener("keydown", press(true));
-	addEventListener("keyup", press(false));
+	if (calcs) addEventListener("keydown", press(true));
+	if (calcs) addEventListener("keyup", press(false));
 
-	if (c) ctx = c.getContext('2d', { alpha: false });
-	tilectx = (new OffscreenCanvas(level.width * TILE_WIDTH, level.height * TILE_HEIGHT)).getContext('2d', { willReadFrequently: true });
+	if (c && draw) ctx = c.getContext('2d', { alpha: false });
+	if (draw) tilectx = (new OffscreenCanvas(level.width * TILE_WIDTH, level.height * TILE_HEIGHT)).getContext('2d', { willReadFrequently: true });
 
 	if (ctx) ctx.canvas.style.cursor = 'progress';
 	level.onAssetsLoaded(function () {
 		if (ctx) ctx.canvas.style.cursor = '';
 		updateTileCanvas();
 
-		if (tps) tpsC = performance.now();
-		if (fps) fpsC = performance.now();
+		if (tps && calcs) tpsC = performance.now();
+		if (fps && draw) fpsC = performance.now();
 
-		if (rs) setInterval(step, 8); // 125 tps
+		if (calcs) setInterval(step, 8); // 125 tps
 		if (ctx) requestAnimationFrame(draw);
 	});
 }
