@@ -168,7 +168,7 @@ Level.prototype.onAssetsLoaded = function (callback) {
 	});
 };
 
-function start({canvas: c, tps, fps, asset, tile: te, sprite: se}) {
+function start({step: rs = true, canvas: c, tps, fps, asset, tile: te, sprite: se}) {
 	tpsElem = tps;
 	fpsElem = fps;
 	assetElem = asset;
@@ -194,7 +194,7 @@ function start({canvas: c, tps, fps, asset, tile: te, sprite: se}) {
 		if (tps) tpsC = performance.now();
 		if (fps) fpsC = performance.now();
 
-		setInterval(step, 8); // 125 tps
+		if (rs) setInterval(step, 8); // 125 tps
 		if (ctx) requestAnimationFrame(draw);
 	});
 }
