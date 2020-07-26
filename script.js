@@ -136,6 +136,7 @@ function ndArray(bg, ...dim) {
 		return bg;
 };
 function Level(data, bg = 0) {
+	this.compressed = data;
 	this.width = data.width;
 	this.height = data.height;
 	this.sprites = data.sprites;
