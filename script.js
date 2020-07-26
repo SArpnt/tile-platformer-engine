@@ -169,7 +169,7 @@ Level.prototype.onAssetsLoaded = function (callback) {
 	});
 };
 
-function start({ step: doStep = true, draw: doDraw = true, zoom, canvas: c, tps, fps, asset, tile: te, sprite: se }) {
+function start({ step: doStep = true, autoStep = true, draw: doDraw = true, autoDraw = true, zoom, canvas: c, tps, fps, asset, tile: te, sprite: se }) {
 	tpsElem = tps;
 	fpsElem = fps;
 	assetElem = asset;
@@ -204,7 +204,7 @@ function start({ step: doStep = true, draw: doDraw = true, zoom, canvas: c, tps,
 		if (tpsElem && doStep) tpsC = performance.now();
 		if (fpsElem && doDraw) fpsC = performance.now();
 
-		if (doStep) setInterval(step, 8); // 125 tps
-		if (ctx) requestAnimationFrame(draw);
+		if (doStep && autoStep) setInterval(step, 8); // 125 tps
+		if (ctx && autoDraw) requestAnimationFrame(draw);
 	});
 }
