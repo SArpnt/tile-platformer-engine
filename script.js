@@ -39,7 +39,7 @@ function step() {
 		tpsC = now;
 	}
 };
-function draw() {
+function draw(request = true) {
 	ctx.fillStyle = "magenta"; // temporary bg
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -51,7 +51,7 @@ function draw() {
 		fpsElem.innerHTML = Math.round(1000 / (now - fpsC)); // fps counter
 		fpsC = now;
 	}
-	requestAnimationFrame(draw);
+	if (request) requestAnimationFrame(draw);
 };
 
 function runSprites() {
