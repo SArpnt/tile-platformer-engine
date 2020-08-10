@@ -146,7 +146,10 @@ function Level(data, bg = 0) {
 		if (!assets[s]) {
 			let i = document.createElement('img');
 			i.src = `assets/${s}.png`;
-			if (assetElem) assetElem.appendChild(i);
+			if (assetElem) {
+				i.style = "image-rendering: pixelated";
+				assetElem.appendChild(i);
+			}
 			assets[s] = i;
 		}
 
