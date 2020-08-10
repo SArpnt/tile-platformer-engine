@@ -21,6 +21,8 @@ var ctx,
 
 let tpsC,
 	fpsC,
+	ltd = 0,
+	lfd = 0,
 	tpsElem,
 	fpsElem,
 	assetElem,
@@ -28,16 +30,18 @@ let tpsC,
 	spriteElem;
 
 function step() {
-	runSprites();
+	let now = performance.now();
+	let deltaTime = (ltd + now - tpsC) / 2;
+	ltd = deltaTime;
+	tpsC = now;
+
+	runSprites(deltaTime);
 
 	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + ctx.canvas.width)); // keep scrolling in boundaries and round
 	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + ctx.canvas.height));
 
-	if (tpsElem) {
-		let now = performance.now();
-		tpsElem.innerHTML = Math.round(1000 / (now - tpsC));
-		tpsC = now;
-	}
+	if (tpsElem)
+		tpsElem.innerHTML = Math.round(1000 / deltaTime);
 };
 function draw(request = true) {
 	ctx.fillStyle = "magenta"; // temporary bg
@@ -48,15 +52,17 @@ function draw(request = true) {
 
 	if (fpsElem) {
 		let now = performance.now();
-		fpsElem.innerHTML = Math.round(1000 / (now - fpsC)); // fps counter
+		let deltaTime = (lfd + now - fpsC) / 2;
+		lfd = deltaTime;
+		fpsElem.innerHTML = Math.round(1000 / deltaTime);
 		fpsC = now;
 	}
 	if (request) requestAnimationFrame(draw);
 };
 
-function runSprites() {
-	for (let sN in cSprites) // sN is spriteNumber
-		cSprites[sN].update(sN);
+function runSprites(deltaTime) {
+	for (let spriteNum in cSprites)
+		cSprites[spriteNum].update(deltaTime, spriteNum);
 }
 
 function drawSprites(ox, oy) {
@@ -204,10 +210,10 @@ function start({ step: doStep = true, autoStep = true, draw: doDraw = true, auto
 		if (ctx) ctx.canvas.style.cursor = '';
 		updateTileCanvas();
 
-		if (tpsElem && doStep) tpsC = performance.now();
+		if (doStep) tpsC = performance.now();
 		if (fpsElem && doDraw) fpsC = performance.now();
 
-		if (doStep && autoStep) setInterval(step, 8); // 125 tps
+		if (doStep && autoStep) setInterval(step, 0);
 		if (ctx && autoDraw) requestAnimationFrame(draw);
 	});
 }

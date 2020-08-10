@@ -54,43 +54,57 @@ var sScript = {
 		return pos;
 	},
 
-	move(pos, input, op = {}) {
-		op = Object.assign(op, { // add default setting for op
+	move(pos, dt, input, op = {}) {
+		dt /= 8
+		op = Object.assign(op, { // add default settings for op
 			xs: 1,
 			ys: 1,
 			xg: false,
 			yg: true,
 			friction: 1.1,
-			jump: -3
+			xj: -3,
+			yj: -3,
 		});
 
 		if (op.xg) {
 			let flip = op.xs > 0;
 			let side = flip ? 'left' : 'right';
-			if (pos.collisions[side] && input[side]) pos.xv = op.jump; //jump
-			pos.xv += op.xs * (0.1 - (input[side] * Math.max(-1 - pos.xv * (flip ? 1 : -1), 0) / 30)); // gravity is reduced on ascent while holding up for higher jumps
+			if (pos.collisions[side] && input[side])
+				pos.xv = op.xj; //jump
+			pos.xv += dt * op.xs * (0.1 - (input[side] * Math.max(-1 + pos.xv * (flip ? -1 : 1), 0) / 30)); // gravity is reduced on ascent while holding up for higher jumps
 		} else {
 			if (input.left) // walk/run
-				pos.xv -= (.1 + keyInput.sprint * .05) * op.xs;
+				pos.xv -= dt * (.1 + keyInput.sprint * .05) * op.xs;
 			if (input.right)
-				pos.xv += (.1 + keyInput.sprint * .05) * op.xs;
+				pos.xv += dt * (.1 + keyInput.sprint * .05) * op.xs;
 		}
 		if (op.yg) {
 			let flip = op.ys > 0;
 			let side = flip ? 'up' : 'down';
-			if (pos.collisions[side] && input[side]) pos.yv = op.jump;
-			pos.yv += op.ys * (0.1 - (input[side] * Math.max(-1 - pos.yv * (flip ? 1 : -1), 0) / 30));
+			if (pos.collisions[side] && input[side])
+				pos.yv = op.yj;
+			pos.yv += dt * op.ys * (0.1 - (input[side] * Math.max(-1 + pos.yv * (flip ? -1 : 1), 0) / 30));
 		} else {
 			if (input.up) // walk/run
-				pos.yv -= (.1 + input.sprint * .05) * op.ys;
+				pos.yv -= dt * (.1 + input.sprint * .05) * op.ys;
 			if (input.down)
-				pos.yv += (.1 + input.sprint * .05) * op.ys;
+				pos.yv += dt * (.1 + input.sprint * .05) * op.ys;
 		}
 
-		pos.y += pos.yv;
-		pos.x += pos.xv;
-		if (!op.xg) pos.xv /= op.friction;
-		if (!op.yg) pos.yv /= op.friction;
+		if (dt * Math.abs(pos.xv) >= TILE_WIDTH) {
+			console.warn(`Sprite moving too fast! Speed capped to prevent collision issues
+${dt * Math.abs(pos.xv)} >= ${TILE_WIDTH}`);
+			pos.xv = (TILE_WIDTH - .5) / dt * (pos.xv > 0 ? 1 : -1);
+		}
+		if (dt * Math.abs(pos.yv) >= TILE_HEIGHT) {
+			console.warn(`Sprite moving too fast! Speed capped to prevent collision issues
+${dt * Math.abs(pos.yv)} >= ${TILE_HEIGHT}`);
+			pos.yv = (TILE_HEIGHT - .5) / dt * (pos.yv > 0 ? 1 : -1);
+		}
+		pos.y += dt * pos.yv;
+		pos.x += dt * pos.xv;
+		if (!op.xg) pos.xv /= op.friction ** dt;
+		if (!op.yg) pos.yv /= op.friction ** dt;
 
 		return pos;
 	},
