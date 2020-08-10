@@ -188,7 +188,7 @@ sprite = {
 
 			scrollX += ( // scroll camera to final position based on movement
 				(a - this.pos.x - scrollX) // final camera position
-					> 0 ? Math.max : Math.min)(this.pos.xv * -2.5, 0);
+					> 0 ? Math.max : Math.min)(this.pos.xv * -1.4, 0);
 
 			if ( // jitter fix
 				state == 1 ?

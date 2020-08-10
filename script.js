@@ -37,8 +37,8 @@ function step() {
 
 	runSprites(deltaTime);
 
-	scrollX = Math.round(Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + ctx.canvas.width)); // keep scrolling in boundaries and round
-	scrollY = Math.round(Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + ctx.canvas.height));
+	scrollX = Math.max(Math.min(scrollX, 0), (level.width * -TILE_WIDTH) + ctx.canvas.width); // keep scrolling in boundaries
+	scrollY = Math.max(Math.min(scrollY, 0), (level.height * -TILE_HEIGHT) + ctx.canvas.height);
 
 	if (tpsElem)
 		tpsElem.innerHTML = Math.round(1000 / deltaTime);
@@ -73,8 +73,8 @@ function drawSprites(ox, oy) {
 			s.img[2],
 			s.img[3],
 			s.img[4],
-			Math.round(s.pos.x) + ox,
-			Math.round(s.pos.y) + oy,
+			Math.round(s.pos.x + ox),
+			Math.round(s.pos.y + oy),
 			s.img[3],
 			s.img[4],
 		);
@@ -82,8 +82,8 @@ function drawSprites(ox, oy) {
 function copyTiles(ox, oy) {
 	ctx.drawImage(
 		tilectx.canvas,
-		ox,
-		oy,
+		Math.round(ox),
+		Math.round(oy),
 	);
 }
 function drawTile(t, x, y) {
