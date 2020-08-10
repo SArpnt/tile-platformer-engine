@@ -173,11 +173,11 @@ sprite = {
 					}
 				})()) this.scrollState = 0;
 
-				let i = this.pos.x + scrollX; // player relative to camera
+				let i = (this.pos.x + scrollX) / ctx.canvas.width; // player screen position from 0-1
 
-				if (i > ((this.scrollState == 1) ? 120 : 232)) // past scroll border
+				if (i > ((this.scrollState == 1) ? .375 : .75)) // past scroll border
 					this.scroll(1, 120);
-				else if (i < ((this.scrollState == -1) ? 184 : 72))
+				else if (i < ((this.scrollState == -1) ? .625 : .25))
 					this.scroll(-1, 184);
 			}
 			cSprites.push(new sprite.particle.Star(this.pos.x + 4, this.pos.y + 12));
