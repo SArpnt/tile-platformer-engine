@@ -150,13 +150,14 @@ function Level(data) {
 		}
 	if (tileElem)
 		this.onAssetsLoaded(function () {
-			for (let t of tile) {
+			for (let t in tile) {
 				let c = document.createElement('canvas');
 				let cCtx = c.getContext('2d');
 				c.width = TILE_WIDTH;
 				c.height = TILE_HEIGHT;
 				c.classList.add('pixel');
-				drawTile(t, 0, 0, cCtx);
+				c.dataset.tile = t;
+				drawTile(tile[t], 0, 0, cCtx);
 				tileElem.appendChild(c);
 			}
 		});
