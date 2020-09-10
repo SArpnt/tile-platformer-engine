@@ -65,9 +65,9 @@ function runSprites(deltaTime) {
 		cSprites[spriteNum].update(deltaTime, spriteNum);
 }
 
-function drawSprites(ox, oy) {
+function drawSprites(ox, oy, c = ctx) {
 	for (let s of cSprites)
-		ctx.drawImage(
+		c.drawImage(
 			assets[s.img[0]],
 			s.img[1],
 			s.img[2],
@@ -79,16 +79,16 @@ function drawSprites(ox, oy) {
 			s.img[4],
 		);
 }
-function copyTiles(ox, oy) {
-	ctx.drawImage(
+function copyTiles(ox, oy, c = ctx) {
+	c.drawImage(
 		tilectx.canvas,
 		Math.round(ox),
 		Math.round(oy),
 	);
 }
-function drawTile(t, x, y) {
-	tilectx.clearRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-	tilectx.drawImage(
+function drawTile(t, x, y, c = tilectx) {
+	c.clearRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+	c.drawImage(
 		assets[t.img[0]],
 		t.img[1] * TILE_WIDTH,
 		t.img[2] * TILE_HEIGHT,
@@ -148,11 +148,23 @@ function Level(data) {
 			}
 			assets[s] = i;
 		}
+	if (tileElem)
+		this.onAssetsLoaded(function () {
+			for (let t of tile) {
+				let c = document.createElement('canvas');
+				let cCtx = c.getContext('2d');
+				c.width = TILE_WIDTH;
+				c.height = TILE_HEIGHT;
+				c.classList.add('pixel');
+				drawTile(t, 0, 0, cCtx);
+				tileElem.appendChild(c);
+			}
+		});
 };
 Level.prototype.onAssetsLoaded = function (callback) {
-	let remaining = level.assets.length;
+	let remaining = this.assets.length;
 	let rd = () => --remaining || callback(); // decrement remaining and then run callback if 0
-	level.assets.forEach(function (e) {
+	this.assets.forEach(function (e) {
 		assets[e].complete ?
 			rd() :
 			assets[e].addEventListener('load', rd);
