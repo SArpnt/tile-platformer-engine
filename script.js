@@ -9,7 +9,7 @@ var ctx,
 	TILE_HEIGHT,
 	tile,
 	sprite,
-	compressedLevel,
+	levelData,
 	cSprites = [],
 	keyInput = {
 		up: false,
@@ -130,23 +130,13 @@ function press(v) {
 	};
 }
 
-function ndArray(bg, ...dim) {
-	if (dim.length) {
-		let a = [],
-			l = dim[0],
-			d = dim.slice(1);
-		for (let i = 0; i < l; i++)
-			a.push(ndArray(bg, ...d));
-		return a;
-	} else
-		return bg;
-};
-function Level(data, bg = 0) {
-	this.compressed = data;
+function Level(data) {
+	this.data = data;
 	this.width = data.width;
 	this.height = data.height;
 	this.sprites = data.sprites;
 	this.assets = data.assets;
+	this.tiles = data.tiles;
 
 	for (let s of data.assets)
 		if (!assets[s]) {
@@ -158,15 +148,6 @@ function Level(data, bg = 0) {
 			}
 			assets[s] = i;
 		}
-
-	this.tiles = ndArray(bg, this.height, data.width);
-	for (let rect of data.tiles) {
-		rect.xe = rect.xe || rect.x;
-		rect.ye = rect.ye || rect.y;
-		for (let y = rect.y; y <= rect.ye; y++)
-			for (let x = rect.x; x <= rect.xe; x++)
-				this.tiles[y][x] = rect.id;
-	}
 };
 Level.prototype.onAssetsLoaded = function (callback) {
 	let remaining = level.assets.length;
@@ -185,7 +166,7 @@ function start({ step: doStep = true, autoStep = true, draw: doDraw = true, auto
 	tileElem = te;
 	spriteElem = se;
 
-	level = new Level(compressedLevel);
+	level = new Level(levelData);
 
 	for (let s of level.sprites)
 		cSprites.push(new (s[0].split('.').reduce((a, b) => a[b], sprite))(...s.slice(1)));
