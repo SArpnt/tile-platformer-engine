@@ -12,6 +12,12 @@
 			flex-direction: column;
 			flex-wrap: wrap;
 		}
+		.flex-space {
+			margin: -2px;
+		}
+		.flex-space > * {
+			margin: 2px;
+		}
 	</style>
 </head>
 
@@ -26,9 +32,15 @@
 })">
 	<div style="display: flex; flex-direction: row; max-width: 100%;">
 		<canvas id="canvas" width="320" height="240" class="pixel"></canvas>
-		<div id="asset" class="pixel flex-column" style="background: darkmagenta;"></div>
-		<div id="tile" class="pixel flex-column" style="background: darkred;"></div>
-		<div id="sprite" class="pixel flex-column" style="background: darkorange;"></div>
+		<div style="background: darkmagenta;">
+			<div id="asset" class="pixel flex-column flex-space"></div>
+		</div>
+		<div style="background: darkred;">
+			<div id="tile" class="pixel flex-column flex-space"></div>
+		</div>
+		<div style="background: darkorange;">
+			<div id="sprite" class="pixel flex-column flex-space"></div>
+		</div>
 	</div>
 	<div>FPS: <span id="fps"></span></div>
 	<div>TPS: <span id="tps"></span></div>
